@@ -6,7 +6,7 @@ import base64
 
 import psycopg2
 from psycopg2 import sql
-from cryptography.fernet import Fernet
+from cryptography.fernet import Fernet, InvalidToken
 
 from keystore import ReferenceDatabase
 
@@ -52,8 +52,9 @@ class TestDatabase(unittest.TestCase):
 
 
     def test_get_key(self):
-        pk = self.db.get(self.address_hex, 'foo')
-        logg.info('pk {}'.format(pk.hex()))
+        self.db.get(self.address_hex, 'foo')
+        with self.assertRaises(InvalidToken):
+           self.db.get(self.address_hex, 'bar')
 
 
 if __name__ == '__main__':

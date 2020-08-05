@@ -24,7 +24,6 @@ class ReferenceDatabase:
 
 
         def __init__(self, dbname, **kwargs):
-            logg.debug(kwargs)
             self.conn = psycopg2.connect('dbname='+dbname)
             self.cur = self.conn.cursor()
             self.symmetric_key = kwargs.get('symmetric_key')
@@ -32,7 +31,6 @@ class ReferenceDatabase:
 
         def get(self, address, password=None):
             s = sql.SQL('SELECT key_ciphertext FROM ethereum WHERE wallet_address_hex = %s')
-            logg.debug(address)
             self.cur.execute(s, [ address ] )
             k = self.cur.fetchone()[0]
             return self._decrypt(k, password)
@@ -41,9 +39,7 @@ class ReferenceDatabase:
         def new(self, address, password=None):
             b = os.urandom(32)
             pk = keyapi.PrivateKey(b)
-            logg.debug('pk {}'.format(pk.to_hex()))
             c = self._encrypt(pk.to_bytes(), password)
-            logg.debug('pkc {} {}'.format(c, len(pk.to_bytes())))
             s = sql.SQL('INSERT INTO ethereum (wallet_address_hex, key_ciphertext) VALUES (%s, %s)')
             self.cur.execute(s, [ address, c.decode('utf-8') ])
 
