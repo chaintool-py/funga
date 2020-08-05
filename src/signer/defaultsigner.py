@@ -28,7 +28,7 @@ class ReferenceSigner(Signer):
 
 
     def signTransaction(self, tx, password=None):
-        s = tx.serialize()
+        s = tx.rlp_serialize()
         h = sha3.keccak_256()
         h.update(s)
         g = h.digest()

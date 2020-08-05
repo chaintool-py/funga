@@ -56,8 +56,6 @@ class TestSign(unittest.TestCase):
         t = Transaction(tx, 461, 8995)
         s = ReferenceSigner(self.getPk)
         z = s.signTransaction(t)
-        logg.debug('{}'.format(z.to_bytes()))
-        logg.debug('{}'.format(t.serialize().hex()))
 
 
 if __name__ == '__main__':

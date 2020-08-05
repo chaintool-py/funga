@@ -8,19 +8,21 @@ from jsonrpc.exceptions import *
 
 from signer import ReferenceSigner
 from keystore import ReferenceDatabase
+from transaction import Transaction
 
 logging.basicConfig(level=logging.DEBUG)
 logg = logging.getLogger()
 
 db = None
 signer = None
+chainId = 8995
 
 
 def personal_new_account(p):
     if p.__class__.__name__ != 'list':
         e = JSONRPCInvalidParams()
         e.data = 'parameter must be list containing one string'
-        raise ValueError(e )
+        raise ValueError(e)
     if len(p) != 1:
         e = JSONRPCInvalidParams()
         e.data = 'parameter must be list containing one string'
@@ -32,11 +34,22 @@ def personal_new_account(p):
 
     r = db.new(p[0])
              
-    return [r]
+    return r
+
+
+def personal_sign_transaction(p):
+    t = Transaction(p[0], 0, 8995)
+    z = signer.signTransaction(t, p[1])
+    raw_signed_tx = t.rlp_serialize()
+    return {
+        'raw': '0x' + raw_signed_tx.hex(),
+        'tx': t.serialize(),
+        }
 
 
 methods = {
         'personal_newAccount': personal_new_account,
+        'personal_signTransaction': personal_sign_transaction,
     }
 
 

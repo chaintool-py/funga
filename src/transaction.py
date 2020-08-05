@@ -23,10 +23,10 @@ class Transaction:
         self.v = chainId
         self.r = 0
         self.s = 0
-        self.sender = tx['from']
+        self.sender = strip_hex_prefix(tx['from'])
 
 
-    def serialize(self):
+    def rlp_serialize(self):
         b = self.nonce.to_bytes(8, byteorder='little')
         s = [
             self.nonce,
@@ -40,3 +40,16 @@ class Transaction:
             self.s,
                 ]
         return rlp_encode(s)
+
+    def serialize(self):
+        return {
+            'nonce': '0x' + hex(self.nonce),
+            'gasPrice': '0x' + hex(self.gas_price),
+            'gas': '0x' + hex(self.start_gas),
+            'to': '0x' + self.to.hex(),
+            'value': '0x' + hex(self.value),
+            'data': '0x' + self.data.hex(),
+            'v': '0x' + hex(self.v),
+            'r': '0x' + self.r.hex(),
+            's': '0x' + self.s.hex(),
+            }
