@@ -1,8 +1,14 @@
+cffi==1.14.1
+cryptography==3.0
 cytoolz==0.10.1
 eth-hash==0.2.0
 eth-keys==0.3.3
 eth-typing==2.2.1
 eth-utils==1.9.0
 json-rpc==1.13.0
+psycopg2==2.8.5
+pycparser==2.20
+pysha3==1.0.2
 rlp==1.2.0
+six==1.15.0
 toolz==0.10.0
