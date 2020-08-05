@@ -40,7 +40,7 @@ class TestDatabase(unittest.TestCase):
 """)
         self.db.cur.execute("CREATE UNIQUE INDEX ethereum_address_idx ON ethereum ( wallet_address_hex );")
         self.db.conn.commit()
-        self.db.new(self.address_hex)
+        self.db.new(self.address_hex, 'foo')
 
 
     def tearDown(self):

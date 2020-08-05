@@ -15,6 +15,11 @@ logging.basicConfig(level=logging.DEBUG)
 logg = logging.getLogger(__file__)
 
 
+
+def to_bytes(x):
+    return x.encode('utf-8')
+
+    
 class ReferenceDatabase:
 
 
@@ -52,7 +57,8 @@ class ReferenceDatabase:
             h = sha3.keccak_256()
             h.update(self.symmetric_key)
             if password != None:
-                h.update(password)
+                password_bytes = to_bytes(password)
+                h.update(password_bytes)
             g = h.digest()
             return Fernet(base64.b64encode(g))
 
