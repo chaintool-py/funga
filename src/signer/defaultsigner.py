@@ -27,12 +27,12 @@ class ReferenceSigner(Signer):
         super(ReferenceSigner, self).__init__(keyGetter)
 
 
-    def signTransaction(self, tx):
+    def signTransaction(self, tx, password=None):
         s = tx.serialize()
         h = sha3.keccak_256()
         h.update(s)
         g = h.digest()
-        k = keys.PrivateKey(self.keyGetter(tx.sender))
+        k = keys.PrivateKey(self.keyGetter(tx.sender, password))
         z = keys.ecdsa_sign(message_hash=g, private_key=k)
         tx.v = (tx.v * 2) + 35 + z[64]
         tx.r = z[:32]

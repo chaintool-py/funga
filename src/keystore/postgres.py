@@ -9,6 +9,8 @@ from eth_keys import KeyAPI
 from eth_keys.backends import NativeECCBackend
 import sha3
 
+from common import strip_hex_prefix
+
 keyapi = KeyAPI(NativeECCBackend)
 
 logging.basicConfig(level=logging.DEBUG)
@@ -24,7 +26,7 @@ class ReferenceDatabase:
 
 
         def __init__(self, dbname, **kwargs):
-            self.conn = psycopg2.connect('dbname='+dbname)
+            self.conn = psycopg2.connect('dbname=' + dbname)
             self.cur = self.conn.cursor()
             self.symmetric_key = kwargs.get('symmetric_key')
 
@@ -36,12 +38,20 @@ class ReferenceDatabase:
             return self._decrypt(k, password)
 
 
-        def new(self, address, password=None):
+        def new(self, password=None):
             b = os.urandom(32)
             pk = keyapi.PrivateKey(b)
+
+            pubk = keyapi.private_key_to_public_key(pk)
+            address_hex = pubk.to_checksum_address()
+            address_hex_clean = strip_hex_prefix(address_hex)
+
+            logg.debug('address {}'.format(address_hex_clean))
             c = self._encrypt(pk.to_bytes(), password)
             s = sql.SQL('INSERT INTO ethereum (wallet_address_hex, key_ciphertext) VALUES (%s, %s)')
-            self.cur.execute(s, [ address, c.decode('utf-8') ])
+            self.cur.execute(s, [ address_hex_clean, c.decode('utf-8') ])
+            self.conn.commit()
+            return address_hex
 
 
         def _encrypt(self, private_key, password):
@@ -64,7 +74,8 @@ class ReferenceDatabase:
             return f.decrypt(c.encode('utf-8'))
              
 
-        def __exit__(self):
-            self.conn
+        def __del__(self):
+            logg.debug('closing database')
+            self.conn.commit()
             self.cur.close()
             self.conn.close()
