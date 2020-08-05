@@ -38,18 +38,8 @@ class TestDatabase(unittest.TestCase):
         wallet_address_hex CHAR(40) NOT NULL
         );
 """)
-        self.db.conn.commit()
         self.db.cur.execute("CREATE UNIQUE INDEX ethereum_address_idx ON ethereum ( wallet_address_hex );")
-
-#        self.db.cur.execute(
-#                sql.SQL('INSERT INTO ethereum (key_ciphertext, wallet_address_hex) VALUES (%s, %s)'),
-#                [
-#                    pk_ciphertext.decode('utf-8'),
-#                    self.addr,
-#                    ],
-#                )
         self.db.conn.commit()
-
         self.db.new(self.address_hex)
 
 
