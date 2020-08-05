@@ -58,7 +58,7 @@ class TestSign(unittest.TestCase):
         z = s.signTransaction(t)
         logg.debug('{}'.format(z.to_bytes()))
         logg.debug('{}'.format(t.serialize().hex()))
-        
+
 
 if __name__ == '__main__':
     unittest.main()
