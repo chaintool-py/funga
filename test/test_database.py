@@ -52,7 +52,7 @@ class TestDatabase(unittest.TestCase):
 
 
     def test_get_key(self):
-        pk = self.db.get(self.address_hex)
+        pk = self.db.get(self.address_hex, 'foo')
         logg.info('pk {}'.format(pk.hex()))
 
 
