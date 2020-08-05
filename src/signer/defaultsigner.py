@@ -10,15 +10,19 @@ logg = logging.getLogger(__name__)
 
 class Signer:
 
+
     def __init__(self, keyGetter):
         self.keyGetter = keyGetter
+
 
     def signTransaction(self, tx):
         raise NotImplementedError
 
 
+
 class ReferenceSigner(Signer):
-    
+   
+
     def __init__(self, keyGetter):
         super(ReferenceSigner, self).__init__(keyGetter)
 
@@ -34,6 +38,3 @@ class ReferenceSigner(Signer):
         tx.r = z[:32]
         tx.s = z[32:64]
         return z
-
-
-
