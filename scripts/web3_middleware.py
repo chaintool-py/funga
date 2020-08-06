@@ -83,4 +83,9 @@ w3 = Web3(WebsocketProvider('ws://127.0.0.1:8546'))
 w3.eth.personal = w3.geth.personal
 w3.middleware_onion.add(PlatformMiddleware)
 #print(w3.eth.personal.newAccount('foo'))
-print(w3.eth.blockNumber)
+#print(w3.eth.blockNumber)
+print(w3.eth.sendTransaction({
+        'to': '0xd3CdA913deB6f67967B99D67aCDFa1712C293601',
+        'from': web3.eth.coinbase,
+        'value': 1000
+    })
