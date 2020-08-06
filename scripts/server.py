@@ -53,9 +53,10 @@ methods = {
     }
 
 
-def jsonrpc_error(id, err):
+def jsonrpc_error(rpc_id, err):
     return {
             'json-rpc': '2.0',
+            'id': rpc_id,
             'error': {
                 'code': err.CODE,
                 'message': err.MESSAGE,
@@ -71,6 +72,12 @@ def jsonrpc_ok(rpc_id, response):
             }
 
 
+def is_valid_json(j):
+    if j.get('id') == 'None':
+        raise ValueError('id missing')
+    return True
+
+
 def process_input(j):
 
     rpc_id = j['id']
@@ -81,20 +88,33 @@ def process_input(j):
 
 
 def start_server():
-    os.unlink('/tmp/foo.ipc')
+    try:
+        os.unlink('/tmp/foo.ipc')
+    except FileNotFoundError:
+        pass
     s = socket.socket(family = socket.AF_UNIX, type = socket.SOCK_STREAM)
     s.bind('/tmp/foo.ipc')
     s.listen(10)
     while True:
         (csock, caddr) = s.accept()
         d = csock.recv(4096)
+        j = None
         try:
-            j = json.loads(b)
-            process_input(j)
+            j = json.loads(d)
+            is_valid_json(j)
             logg.debug('{}'.format(d.decode('utf-8')))
-            csock.send(json.dumps(jsonrpc_ok(0, [])).encode('utf-8'))
         except:
             csock.send(json.dumps(jsonrpc_error(None, JSONRPCParseError)).encode('utf-8'))
+            csock.close()
+            continue
+
+        try:
+            (rpc_id, r) = process_input(j)
+            csock.send(json.dumps(jsonrpc_ok(rpc_id, r)).encode('utf-8'))
+        except:
+            # TODO: handle cases to give better error context to caller
+            csock.send(json.dumps(jsonrpc_error(j['id'], JSONRPCServerError)).encode('utf-8'))
+
         csock.close()
     s.close()
 
