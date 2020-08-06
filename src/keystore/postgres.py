@@ -10,6 +10,7 @@ from eth_keys.backends import NativeECCBackend
 import sha3
 
 from common import strip_hex_prefix
+from keystore.interface import Keystore
 
 keyapi = KeyAPI(NativeECCBackend)
 
@@ -21,9 +22,23 @@ logg = logging.getLogger(__file__)
 def to_bytes(x):
     return x.encode('utf-8')
 
-    
-class ReferenceDatabase:
 
+
+
+
+
+class ReferenceKeystore(Keystore):
+
+        schema = [
+    """CREATE TABLE ethereum (
+        id SERIAL NOT NULL PRIMARY KEY,
+        key_ciphertext VARCHAR(256) NOT NULL,
+        wallet_address_hex CHAR(40) NOT NULL
+        );
+""",
+    """CREATE UNIQUE INDEX ethereum_address_idx ON ethereum ( wallet_address_hex );
+""",
+    ]
 
         def __init__(self, dbname, **kwargs):
             self.conn = psycopg2.connect('dbname=' + dbname)
@@ -32,8 +47,9 @@ class ReferenceDatabase:
 
 
         def get(self, address, password=None):
+            safe_address = strip_hex_prefix(address)
             s = sql.SQL('SELECT key_ciphertext FROM ethereum WHERE wallet_address_hex = %s')
-            self.cur.execute(s, [ address ] )
+            self.cur.execute(s, [ safe_address ] )
             k = self.cur.fetchone()[0]
             return self._decrypt(k, password)
 

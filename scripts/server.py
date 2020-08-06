@@ -129,7 +129,7 @@ def init():
             'symmetric_key': secret,
             }
     db = ReferenceDatabase('cic_signer', **kw)
-    signer = ReferenceSigner(db.get)
+    signer = ReferenceSigner(db)
 
 
 if __name__ == '__main__':
