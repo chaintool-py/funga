@@ -33,8 +33,10 @@ class PlatformMiddleware:
         self.w3 = w3 
         self.make_request = make_request
 
-
+    
+    # TODO: understand what format input params come in
     # single entry input gives a tuple on params, wtf...
+    # dict input comes as [{}] and fails if not passed on as an array
     @staticmethod
     def _translate_params(params):
         if params.__class__.__name__ == 'tuple':
@@ -43,8 +45,8 @@ class PlatformMiddleware:
                 r.append(p)
             return r
 
-        if params.__class__.__name__ == 'list' and len(params) > 0:
-            return params[0]
+#        if params.__class__.__name__ == 'list' and len(params) > 0:
+#            return params[0]
 
         return params
 
@@ -86,6 +88,6 @@ w3.middleware_onion.add(PlatformMiddleware)
 #print(w3.eth.blockNumber)
 print(w3.eth.sendTransaction({
         'to': '0xd3CdA913deB6f67967B99D67aCDFa1712C293601',
-        'from': web3.eth.coinbase,
+        'from': '0xc305c901078781C232A2a521C2aF7980f8385ee9',
         'value': 1000
-    })
+    }))
