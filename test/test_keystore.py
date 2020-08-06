@@ -8,7 +8,7 @@ import psycopg2
 from psycopg2 import sql
 from cryptography.fernet import Fernet, InvalidToken
 
-from keystore import ReferenceDatabase
+from keystore import ReferenceKeystore
 
 logging.basicConfig(level=logging.DEBUG)
 logg = logging.getLogger()
@@ -31,16 +31,11 @@ class TestDatabase(unittest.TestCase):
         kw = {
                 'symmetric_key': self.symkey,
                 }
-        self.db = ReferenceDatabase('signer_test', **kw)
-        self.db.cur.execute("""CREATE TABLE ethereum (
-        id SERIAL NOT NULL PRIMARY KEY,
-        key_ciphertext VARCHAR(256) NOT NULL,
-        wallet_address_hex CHAR(40) NOT NULL
-        );
-""")
-        self.db.cur.execute("CREATE UNIQUE INDEX ethereum_address_idx ON ethereum ( wallet_address_hex );")
+        self.db = ReferenceKeystore('signer_test', **kw)
+        for ss in ReferenceKeystore.schema:
+            self.db.cur.execute(ss)
         self.db.conn.commit()
-        self.db.new(self.address_hex, 'foo')
+        self.address_hex = self.db.new('foo')
 
 
     def tearDown(self):
@@ -52,6 +47,7 @@ class TestDatabase(unittest.TestCase):
 
 
     def test_get_key(self):
+        logg.debug('getting {}'.format(self.address_hex))
         self.db.get(self.address_hex, 'foo')
         with self.assertRaises(InvalidToken):
            self.db.get(self.address_hex, 'bar')

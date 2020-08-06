@@ -1,1 +1,1 @@
-from keystore.postgres import ReferenceDatabase
+from keystore.postgres import ReferenceKeystore

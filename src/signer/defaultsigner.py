@@ -15,7 +15,7 @@ class Signer:
         self.keyGetter = keyGetter
 
 
-    def signTransaction(self, tx):
+    def signTransaction(self, tx, password=None):
         raise NotImplementedError
 
 
@@ -32,7 +32,7 @@ class ReferenceSigner(Signer):
         h = sha3.keccak_256()
         h.update(s)
         g = h.digest()
-        k = keys.PrivateKey(self.keyGetter(tx.sender, password))
+        k = keys.PrivateKey(self.keyGetter.get(tx.sender, password))
         z = keys.ecdsa_sign(message_hash=g, private_key=k)
         tx.v = (tx.v * 2) + 35 + z[64]
         tx.r = z[:32]

@@ -8,6 +8,15 @@ from common import strip_hex_prefix
 logg = logging.getLogger(__name__)
 
 class Transaction:
+    
+    def rlp_serialize(self):
+        raise NotImplementedError
+
+    def serialize(self):
+        raise NotImplementedError
+
+
+class EIP155Transaction:
 
     def __init__(self, tx, nonce, chainId=1):
        
@@ -21,8 +30,8 @@ class Transaction:
         self.value = int(tx['value'])
         self.data = data
         self.v = chainId
-        self.r = 0
-        self.s = 0
+        self.r = b''
+        self.s = b''
         self.sender = strip_hex_prefix(tx['from'])
 
 
