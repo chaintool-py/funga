@@ -43,6 +43,11 @@ class PlatformMiddleware:
                 r.append(p)
             return r
 
+        if params.__class__.__name__ == 'list' and len(params) > 0:
+            return params[0]
+
+        return params
+
 
     def __call__(self, method, suspect_params):
         self.id_seq += 1
@@ -77,5 +82,5 @@ class PlatformMiddleware:
 w3 = Web3(WebsocketProvider('ws://127.0.0.1:8546'))
 w3.eth.personal = w3.geth.personal
 w3.middleware_onion.add(PlatformMiddleware)
-print(w3.eth.personal.newAccount('foo'))
-#print(w3.eth.blockNumber)
+#print(w3.eth.personal.newAccount('foo'))
+print(w3.eth.blockNumber)
