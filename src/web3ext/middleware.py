@@ -4,8 +4,7 @@ import socket
 import uuid
 import json
 
-logging.basicConfig(level=logging.DEBUG)
-logg = logging.getLogger('foo')
+logg = logging.getLogger(__file__)
 
 
 def jsonrpc_request(method, params):
