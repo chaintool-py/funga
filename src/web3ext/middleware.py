@@ -73,5 +73,23 @@ class PlatformMiddleware:
             #return str(json.dumps(jr))
             return jr
 
+        elif method == 'eth_signTransaction':
+            params = PlatformMiddleware._translate_params(suspect_params)
+            s = socket.socket(family=socket.AF_UNIX, type=socket.SOCK_STREAM, proto=0)
+            ipc_provider_workaround = s.connect(self.ipcaddr)
+            logg.info('redirecting method {}  params {} original params {}'.format(method, params, suspect_params))
+            o = jsonrpc_request(method, params)
+            j = json.dumps(o)
+            logg.debug('send {}'.format(j))
+            s.send(j.encode('utf-8'))
+            r = s.recv(4096)
+            s.close()
+            logg.debug('got recv {}'.format(str(r)))
+            jr = json.loads(r)
+            jr['id'] = self.id_seq
+            #return str(json.dumps(jr))
+            return jr
+
+
         r = self.make_request(method, suspect_params)
         return r

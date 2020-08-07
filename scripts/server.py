@@ -8,7 +8,7 @@ from jsonrpc.exceptions import *
 
 from signer import ReferenceSigner
 from keystore import ReferenceKeystore
-from transaction import Transaction
+from transaction import EIP155Transaction
 
 logging.basicConfig(level=logging.DEBUG)
 logg = logging.getLogger()
@@ -38,18 +38,28 @@ def personal_new_account(p):
 
 
 def personal_sign_transaction(p):
-    t = Transaction(p[0], 0, 8995)
+    t = EIP155Transaction(p[0], 0, 8995)
     z = signer.signTransaction(t, p[1])
     raw_signed_tx = t.rlp_serialize()
-    return {
+    o = {
         'raw': '0x' + raw_signed_tx.hex(),
         'tx': t.serialize(),
         }
+    return o
+
+
+# TODO: temporary workaround for platform, since personal_signTransaction is missing from web3.py
+def eth_signTransaction(tx):
+    password = tx['password']
+    del tx['password']
+    tx_signed =  personal_sign_transaction([tx, password])
+    return tx_signed
 
 
 methods = {
         'personal_newAccount': personal_new_account,
         'personal_signTransaction': personal_sign_transaction,
+        'eth_signTransaction': eth_signTransaction,
     }
 
 

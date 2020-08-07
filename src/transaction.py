@@ -3,7 +3,7 @@ import binascii
 
 from rlp import encode as rlp_encode
 
-from common import strip_hex_prefix
+from common import strip_hex_prefix, add_hex_prefix
 
 logg = logging.getLogger(__name__)
 
@@ -52,13 +52,13 @@ class EIP155Transaction:
 
     def serialize(self):
         return {
-            'nonce': '0x' + hex(self.nonce),
-            'gasPrice': '0x' + hex(self.gas_price),
-            'gas': '0x' + hex(self.start_gas),
-            'to': '0x' + self.to.hex(),
-            'value': '0x' + hex(self.value),
-            'data': '0x' + self.data.hex(),
-            'v': '0x' + hex(self.v),
-            'r': '0x' + self.r.hex(),
-            's': '0x' + self.s.hex(),
+            'nonce': add_hex_prefix(hex(self.nonce)),
+            'gasPrice': add_hex_prefix(hex(self.gas_price)),
+            'gas': add_hex_prefix(hex(self.start_gas)),
+            'to': add_hex_prefix(self.to.hex()),
+            'value': add_hex_prefix(hex(self.value)),
+            'data': add_hex_prefix(self.data.hex()),
+            'v': add_hex_prefix(hex(self.v)),
+            'r': add_hex_prefix(self.r.hex()),
+            's': add_hex_prefix(self.s.hex()),
             }

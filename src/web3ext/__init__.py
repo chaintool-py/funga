@@ -19,7 +19,7 @@ def Web3(blockchain_provider='ws://localhost:8546', ipcaddr=None):
     provider = None
     if re.match(re_websocket, blockchain_provider) != None:
         provider = WebsocketProvider(blockchain_provider)
-    elif re.match(re_http, blockchain_providers[0]) != None:
+    elif re.match(re_http, blockchain_provider) != None:
         provider = HTTPProvider(blockchain_provider)
 
     w3 = Web3super(provider)
