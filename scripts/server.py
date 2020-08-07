@@ -7,7 +7,7 @@ import os
 from jsonrpc.exceptions import *
 
 from signer import ReferenceSigner
-from keystore import ReferenceDatabase
+from keystore import ReferenceKeystore
 from transaction import Transaction
 
 logging.basicConfig(level=logging.DEBUG)
@@ -128,7 +128,7 @@ def init():
     kw = {
             'symmetric_key': secret,
             }
-    db = ReferenceDatabase('cic_signer', **kw)
+    db = ReferenceKeystore('cic_signer', **kw)
     signer = ReferenceSigner(db)
 
 
