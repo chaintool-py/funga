@@ -15,14 +15,12 @@ def create_middleware(ipcaddr='/tmp/foo.ipc'):
 
 
 # overrides the original Web3 constructor
-def Web3(blockchain_providers=[], ipcaddr=None):
-    if len(blockchain_providers) > 1:
-        raise ValueError('backend only supports single provider')
+def Web3(blockchain_provider='ws://localhost:8546', ipcaddr=None):
     provider = None
-    if re.match(re_websocket, blockchain_providers[0]) != None:
-        provider = WebsocketProvider(blockchain_providers[0])
+    if re.match(re_websocket, blockchain_provider) != None:
+        provider = WebsocketProvider(blockchain_provider)
     elif re.match(re_http, blockchain_providers[0]) != None:
-        provider = HTTPProvider(blockchain_providers[0])
+        provider = HTTPProvider(blockchain_provider)
 
     w3 = Web3super(provider)
 
