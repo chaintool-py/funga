@@ -1,3 +1,6 @@
+* 0.1.0
+	- Package wrap with setup.py
+	- Fix hex prefix bug in tx serialization
 * 0.0.1
 	- Introduce signer, transaction, keystore packages
 	- Add test for keystore and signer		
