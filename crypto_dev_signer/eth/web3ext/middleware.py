@@ -55,9 +55,9 @@ class PlatformMiddleware:
 
         if self.re_personal.match(method) != None:
             params = PlatformMiddleware._translate_params(suspect_params)
-            # multiple providers is broken in web3.py 5.12.0
+            # multiple providers is removed in web3.py 5.12.0
             # https://github.com/ethereum/web3.py/issues/1701
-            # hack workaround
+            # thus we need a workaround to use the same web3 instance
             s = socket.socket(family=socket.AF_UNIX, type=socket.SOCK_STREAM, proto=0)
             ipc_provider_workaround = s.connect(self.ipcaddr)
 
@@ -74,6 +74,7 @@ class PlatformMiddleware:
             #return str(json.dumps(jr))
             return jr
 
+        # TODO: DRY
         elif method == 'eth_signTransaction':
             params = PlatformMiddleware._translate_params(suspect_params)
             s = socket.socket(family=socket.AF_UNIX, type=socket.SOCK_STREAM, proto=0)
