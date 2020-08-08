@@ -57,7 +57,7 @@ class TestSign(unittest.TestCase):
         t = EIP155Transaction(tx, 0)
         self.assertRegex(t.__class__.__name__, "Transaction")
         s = t.serialize()
-        self.assertEqual('{}'.format(s), "{'nonce': '0x0x0', 'gasPrice': '0x0x4a817c800', 'gas': '0x0x55f0', 'to': '0x3535353535353535353535353535353535353535', 'value': '0x0x3e8', 'data': '0xdeadbeef', 'v': '0x0x1', 'r': '0x', 's': '0x'}")
+        self.assertEqual('{}'.format(s), "{'nonce': '0x0', 'gasPrice': '0x4a817c800', 'gas': '0x55f0', 'to': '0x3535353535353535353535353535353535353535', 'value': '0x3e8', 'data': '0xdeadbeef', 'v': '0x1', 'r': '', 's': ''}")
         r = t.rlp_serialize()
         self.assertEqual(r.hex(), 'ea808504a817c8008255f09435353535353535353535353535353535353535358203e884deadbeef018080')
 
