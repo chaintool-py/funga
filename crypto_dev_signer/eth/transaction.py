@@ -6,7 +6,7 @@ import binascii
 from rlp import encode as rlp_encode
 
 # local imports
-from common import strip_hex_prefix, add_hex_prefix
+from crypto_dev_signer.common import strip_hex_prefix, add_hex_prefix
 
 logg = logging.getLogger(__name__)
 

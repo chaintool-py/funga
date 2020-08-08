@@ -8,7 +8,7 @@ import psycopg2
 from psycopg2 import sql
 from cryptography.fernet import Fernet, InvalidToken
 
-from keystore import ReferenceKeystore
+from crypto_dev_signer.keystore import ReferenceKeystore
 
 logging.basicConfig(level=logging.DEBUG)
 logg = logging.getLogger()

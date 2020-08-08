@@ -2,7 +2,7 @@ import re
 
 from web3 import Web3 as Web3super
 from web3 import WebsocketProvider, HTTPProvider
-from web3ext.middleware import PlatformMiddleware
+from .middleware import PlatformMiddleware
 
 re_websocket = re.compile('^wss?://')
 re_http = re.compile('^https?://')

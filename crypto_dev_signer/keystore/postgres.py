@@ -12,8 +12,8 @@ from eth_keys.backends import NativeECCBackend
 import sha3
 
 # local imports
-from common import strip_hex_prefix
-from keystore.interface import Keystore
+from crypto_dev_signer.common import strip_hex_prefix
+from .interface import Keystore
 
 keyapi = KeyAPI(NativeECCBackend)
 
