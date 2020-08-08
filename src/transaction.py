@@ -1,11 +1,15 @@
+# standard imports
 import logging
 import binascii
 
+# third-party imports
 from rlp import encode as rlp_encode
 
+# local imports
 from common import strip_hex_prefix, add_hex_prefix
 
 logg = logging.getLogger(__name__)
+
 
 class Transaction:
     

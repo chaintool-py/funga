@@ -1,7 +1,9 @@
+# standard imports
 import logging
 import base64
 import os
 
+# third-party imports
 from cryptography.fernet import Fernet
 import psycopg2
 from psycopg2 import sql
@@ -9,6 +11,7 @@ from eth_keys import KeyAPI
 from eth_keys.backends import NativeECCBackend
 import sha3
 
+# local imports
 from common import strip_hex_prefix
 from keystore.interface import Keystore
 
@@ -18,13 +21,8 @@ logging.basicConfig(level=logging.DEBUG)
 logg = logging.getLogger(__file__)
 
 
-
 def to_bytes(x):
     return x.encode('utf-8')
-
-
-
-
 
 
 class ReferenceKeystore(Keystore):

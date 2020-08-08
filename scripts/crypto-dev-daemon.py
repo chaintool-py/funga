@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import socket
 import json
 import logging 
@@ -19,20 +21,24 @@ chainId = 8995
 
 
 def personal_new_account(p):
-    if p.__class__.__name__ != 'list':
-        e = JSONRPCInvalidParams()
-        e.data = 'parameter must be list containing one string'
-        raise ValueError(e)
-    if len(p) != 1:
-        e = JSONRPCInvalidParams()
-        e.data = 'parameter must be list containing one string'
-        raise ValueError(e)
-    if p[0].__class__.__name__ != 'str':
-        e = JSONRPCInvalidParams()
-        e.data = 'parameter must be list containing one string'
-        raise ValueError(e)
+    password = p
+    if p.__class__.__name__ != 'str':
+        if p.__class__.__name__ != 'list':
+            e = JSONRPCInvalidParams()
+            e.data = 'parameter must be list containing one string'
+            raise ValueError(e)
+        logg.error('foo {}'.format(p))
+        if len(p) != 1:
+            e = JSONRPCInvalidParams()
+            e.data = 'parameter must be list containing one string'
+            raise ValueError(e)
+        if p[0].__class__.__name__ != 'str':
+            e = JSONRPCInvalidParams()
+            e.data = 'parameter must be list containing one string'
+            raise ValueError(e)
+        password = p[0]
 
-    r = db.new(p[0])
+    r = db.new(password)
              
     return r
 
@@ -50,10 +56,7 @@ def personal_sign_transaction(p):
 
 # TODO: temporary workaround for platform, since personal_signTransaction is missing from web3.py
 def eth_signTransaction(tx):
-    password = tx['password']
-    del tx['password']
-    tx_signed =  personal_sign_transaction([tx, password])
-    return tx_signed
+    return personal_sign_transaction([tx, ''])
 
 
 methods = {
@@ -89,9 +92,7 @@ def is_valid_json(j):
 
 
 def process_input(j):
-
     rpc_id = j['id']
-
     m = j['method']
     p = j['params']
     return (rpc_id, methods[m](p))
