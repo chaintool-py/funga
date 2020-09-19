@@ -1,3 +1,5 @@
+* 0.1.1
+	- Create key table only if not exist
 * 0.1.0
 	- Package wrap with setup.py
 	- Fix hex prefix bug in tx serialization

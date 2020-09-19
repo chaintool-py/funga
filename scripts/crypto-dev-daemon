@@ -152,7 +152,7 @@ def init():
     kw = {
             'symmetric_key': secret,
             }
-    db = ReferenceKeystore('cic_signer', **kw)
+    db = ReferenceKeystore(os.environ.get('SIGNER_DATABASE', 'cic_signer'), **kw)
     signer = ReferenceSigner(db)
 
 
