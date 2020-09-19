@@ -1,3 +1,7 @@
+* 0.1.1
+	- Create key table only if not exist
+* 0.1.0
+	- Add web3 ext middleware capturing signer requests
 * 0.0.1
 	- Introduce signer, transaction, keystore packages
 	- Add test for keystore and signer		

@@ -28,13 +28,13 @@ def to_bytes(x):
 class ReferenceKeystore(Keystore):
 
         schema = [
-    """CREATE TABLE ethereum (
+    """CREATE TABLE IF NOT EXISTS ethereum (
         id SERIAL NOT NULL PRIMARY KEY,
         key_ciphertext VARCHAR(256) NOT NULL,
         wallet_address_hex CHAR(40) NOT NULL
         );
 """,
-    """CREATE UNIQUE INDEX ethereum_address_idx ON ethereum ( wallet_address_hex );
+    """CREATE UNIQUE INDEX IF NOT EXISTS ethereum_address_idx ON ethereum ( wallet_address_hex );
 """,
     ]
 
