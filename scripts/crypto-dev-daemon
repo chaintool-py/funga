@@ -20,6 +20,14 @@ signer = None
 chainId = 8995
 
 
+class MissingSecretError(BaseException):
+
+    def __init__(self, message):
+        super(MissingSecretError, self).__init__(message)
+
+    pass
+
+
 def personal_new_account(p):
     password = p
     if p.__class__.__name__ != 'str':
@@ -134,7 +142,12 @@ def start_server():
 
 def init():
     global db, signer
-    secret_hex = os.environ.get('SIGNER_SECRET')
+    secret_hex = ''
+    try:
+        secret_hex = os.environ['SIGNER_SECRET']
+    except KeyError as e:
+        raise MissingSecretError('please set the SIGNER_SECRET environment variable to a valid hex value')
+
     secret = bytes.fromhex(secret_hex)
     kw = {
             'symmetric_key': secret,

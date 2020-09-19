@@ -17,4 +17,6 @@ setup(
         scripts = [
             'scripts/crypto-dev-daemon',
             ],
+        data_files = [('', ['LICENSE.txt'])],
+        url='https://gitlab.com/nolash/crypto-dev-signer',
         )

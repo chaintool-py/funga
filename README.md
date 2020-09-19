@@ -16,13 +16,17 @@ This package is written because at the time no good solution seemed to exist for
 
 Two scripts are currently available:
 
-### `server.py`
+### `crypto-dev-daemon.py`
 
-An Unix socket IPC server implementing the `web3.eth.personal` namespace of the web3 `json-rpc` "standard." 
+An Unix socket IPC server implementing the following web3 json-rpc methods:
+
+* web3.eth.personal.newAccount
+* web3.eth.personal.signTransaction
+* web3.eth.signTransaction
 
 ### `web3_middleware.py`
 
-Demonstrates use of the IPC server as middleware for handling calls to the `personal_*` methods.
+Demonstrates use of the IPC server as middleware for handling calls to the web3 json-rpc methods provided by the daemon.
 
 ### Classes
 
@@ -45,7 +49,9 @@ The classes and packages provided are:
 
 ## VERSION
 
-This software is 0.0.1 alpha state and very brittle.
+This software is in alpha state and very brittle.
+
+Current version is 0.1.0
 
 ## LICENSE
 
