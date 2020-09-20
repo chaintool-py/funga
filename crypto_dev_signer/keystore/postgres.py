@@ -55,12 +55,15 @@ class ReferenceKeystore(Keystore):
         def new(self, password=None):
             b = os.urandom(32)
             pk = keyapi.PrivateKey(b)
+            self.import(pk, password)
 
+
+        def import_key(self, pk, password=None):
             pubk = keyapi.private_key_to_public_key(pk)
             address_hex = pubk.to_checksum_address()
             address_hex_clean = strip_hex_prefix(address_hex)
 
-            logg.debug('address {}'.format(address_hex_clean))
+            logg.debug('inserting address {}'.format(address_hex_clean))
             c = self._encrypt(pk.to_bytes(), password)
             s = sql.SQL('INSERT INTO ethereum (wallet_address_hex, key_ciphertext) VALUES (%s, %s)')
             self.cur.execute(s, [ address_hex_clean, c.decode('utf-8') ])

@@ -6,3 +6,6 @@ class Keystore:
     def new(self, password=None):
         raise NotImplementedError
 
+    def import_key(self, pk, password=None):
+        raise NotImplementedError
+
