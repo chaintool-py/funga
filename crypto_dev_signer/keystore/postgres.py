@@ -55,7 +55,7 @@ class ReferenceKeystore(Keystore):
         def new(self, password=None):
             b = os.urandom(32)
             pk = keyapi.PrivateKey(b)
-            self.import(pk, password)
+            return self.import_key(pk, password)
 
 
         def import_key(self, pk, password=None):

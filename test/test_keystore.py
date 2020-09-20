@@ -1,13 +1,16 @@
 #!/usr/bin/python
 
+# standard imports
 import unittest
 import logging
 import base64
 
+# third-party imports
 import psycopg2
 from psycopg2 import sql
 from cryptography.fernet import Fernet, InvalidToken
 
+# local imports
 from crypto_dev_signer.keystore import ReferenceKeystore
 
 logging.basicConfig(level=logging.DEBUG)
@@ -23,6 +26,7 @@ class TestDatabase(unittest.TestCase):
     db = None
 
     def setUp(self):
+        logg.debug('setup')
         # arbitrary value
         symkey_hex = 'E92431CAEE69313A7BE9E443C4ABEED9BF8157E9A13553B4D5D6E7D51B5021D9'
         self.symkey = bytes.fromhex(symkey_hex)
