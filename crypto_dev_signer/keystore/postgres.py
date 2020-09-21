@@ -1,21 +1,17 @@
 # standard imports
 import logging
 import base64
-import os
 
 # third-party imports
 from cryptography.fernet import Fernet
 import psycopg2
 from psycopg2 import sql
-from eth_keys import KeyAPI
-from eth_keys.backends import NativeECCBackend
 import sha3
 
 # local imports
-from crypto_dev_signer.common import strip_hex_prefix
 from .interface import Keystore
-
-keyapi = KeyAPI(NativeECCBackend)
+from crypto_dev_signer.common import strip_hex_prefix
+from . import keyapi
 
 logging.basicConfig(level=logging.DEBUG)
 logg = logging.getLogger(__file__)
@@ -52,18 +48,11 @@ class ReferenceKeystore(Keystore):
             return self._decrypt(k, password)
 
 
-        def new(self, password=None):
-            b = os.urandom(32)
-            pk = keyapi.PrivateKey(b)
-            return self.import_key(pk, password)
-
-
         def import_key(self, pk, password=None):
             pubk = keyapi.private_key_to_public_key(pk)
             address_hex = pubk.to_checksum_address()
             address_hex_clean = strip_hex_prefix(address_hex)
-
-            logg.debug('inserting address {}'.format(address_hex_clean))
+            logg.debug('importing address {}'.format(address_hex_clean))
             c = self._encrypt(pk.to_bytes(), password)
             s = sql.SQL('INSERT INTO ethereum (wallet_address_hex, key_ciphertext) VALUES (%s, %s)')
             self.cur.execute(s, [ address_hex_clean, c.decode('utf-8') ])
