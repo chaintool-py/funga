@@ -130,8 +130,9 @@ def start_server():
         try:
             (rpc_id, r) = process_input(j)
             csock.send(json.dumps(jsonrpc_ok(rpc_id, r)).encode('utf-8'))
-        except:
+        except Exception as e:
             # TODO: handle cases to give better error context to caller
+            logg.error('error {}'.format(e))
             csock.send(json.dumps(jsonrpc_error(j['id'], JSONRPCServerError)).encode('utf-8'))
 
         csock.close()
