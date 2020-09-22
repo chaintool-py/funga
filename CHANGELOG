@@ -1,3 +1,5 @@
+* 0.2.1
+	- Fix hardcoded daemon signTransaction nonce
 * 0.2.0
 	- Add import method to keystore interface
 * 0.1.1
