@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
         name="crypto-dev-signer",
-        version="0.2.0",
+        version="0.2.1",
         description="A signer and keystore daemon and library for cryptocurrency software development",
         author="Louis Holbrook",
         author_email="dev@holbrook.no",
