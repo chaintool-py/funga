@@ -29,7 +29,7 @@ class PlatformMiddleware:
     def __init__(self, make_request, w3):
         self.w3 = w3 
         self.make_request = make_request
-        if ipcaddr == None:
+        if self.ipcaddr == None:
             raise AttributeError('ipcaddr not set')
 
     
