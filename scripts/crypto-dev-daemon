@@ -51,6 +51,14 @@ if args.s:
 elif config.get('SIGNER_SOCKET_PATH'):
     socket_path = config.get('SIGNER_SOCKET_PATH')
 
+# connect to database
+dsn = 'postgresql://{}:{}@{}:{}/{}'.format(
+        config.get('DATABASE_USER'),
+        config.get('DATABASE_PASSWORD'),
+        config.get('DATABASE_HOST'),
+        config.get('DATABASE_PORT'),
+        config.get('DATABASE_NAME'),    
+    )
 
 class MissingSecretError(BaseException):
 
@@ -194,7 +202,8 @@ def init():
             'symmetric_key': secret,
             }
     #db = ReferenceKeystore(os.environ.get('SIGNER_DATABASE', 'cic_signer'), **kw)
-    db = ReferenceKeystore(config.get('SIGNER_DATABASE'), **kw)
+    #db = ReferenceKeystore(config.get('SIGNER_DATABASE'), **kw)
+    db = ReferenceKeystore(dsn, **kw)
     signer = ReferenceSigner(db)
 
 

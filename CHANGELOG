@@ -1,3 +1,5 @@
+* 0.2.3
+	- Use dsn and config for keystore database settings
 * 0.2.2
 	- Use confini for configurations
 * 0.2.1

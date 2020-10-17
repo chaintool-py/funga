@@ -6,6 +6,7 @@ import base64
 from cryptography.fernet import Fernet
 import psycopg2
 from psycopg2 import sql
+from psycopg2.extensions import make_dsn
 import sha3
 
 # local imports
@@ -34,8 +35,9 @@ class ReferenceKeystore(Keystore):
 """,
     ]
 
-        def __init__(self, dbname, **kwargs):
-            self.conn = psycopg2.connect('dbname=' + dbname)
+        def __init__(self, dsn, **kwargs):
+            logg.debug('dsn {}'.format(dsn))
+            self.conn = psycopg2.connect(make_dsn(dsn))
             self.cur = self.conn.cursor()
             self.symmetric_key = kwargs.get('symmetric_key')
 
