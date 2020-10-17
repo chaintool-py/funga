@@ -1,3 +1,5 @@
+* 0.2.2
+	- Use confini for configurations
 * 0.2.1
 	- Fix hardcoded daemon signTransaction nonce
 * 0.2.0

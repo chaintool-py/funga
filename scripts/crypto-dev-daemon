@@ -1,31 +1,61 @@
-#!/usr/bin/python3
-
+# standard imports
+import os
+import sys
+import stat
 import socket
 import json
 import logging 
-import sys
-import os
+import argparse
 
+# third-party imports
+import confini
 from jsonrpc.exceptions import *
 
+# local imports
 from crypto_dev_signer.eth.signer import ReferenceSigner
 from crypto_dev_signer.eth.transaction import EIP155Transaction
 from crypto_dev_signer.keystore import ReferenceKeystore
 
-logging.basicConfig(level=logging.DEBUG)
+#logging.basicConfig(level=logging.DEBUG)
 logg = logging.getLogger()
+
+config_dir = os.path.join('/usr/local/etc/cic-eth')
 
 db = None
 signer = None
 chainId = 8995
+socket_path = '/run/crypto-dev-signer/jsonrpc.ipc'
+
+argparser = argparse.ArgumentParser()
+argparser.add_argument('-c', type=str, default=config_dir, help='config file')
+argparser.add_argument('--env-prefix', dest='env_prefix', type=str, help='environment prefix for variables to overwrite configuration')
+argparser.add_argument('-i', type=int, help='default chain id for EIP155')
+argparser.add_argument('-s', type=str, help='socket path')
+argparser.add_argument('-v', action='store_true', help='be verbose')
+argparser.add_argument('-vv', action='store_true', help='be more verbose')
+args = argparser.parse_args()
+
+config = confini.Config(args.c, args.env_prefix)
+config.process()
+
+if args.vv:
+    logging.getLogger().setLevel(logging.DEBUG)
+elif args.v:
+    logging.getLogger().setLevel(logging.INFO)
+
+if args.i:
+    chainId = args.i
+
+if args.s:
+    socket_path = args.s
+elif config.get('SIGNER_SOCKET_PATH'):
+    socket_path = config.get('SIGNER_SOCKET_PATH')
 
 
 class MissingSecretError(BaseException):
 
     def __init__(self, message):
         super(MissingSecretError, self).__init__(message)
-
-    pass
 
 
 def personal_new_account(p):
@@ -108,12 +138,20 @@ def process_input(j):
 
 
 def start_server():
+    socket_dir = os.path.dirname(socket_path)
     try:
-        os.unlink('/tmp/foo.ipc')
+        fi = os.stat(socket_dir)
+        if not stat.S_ISDIR:
+            RuntimeError('socket path {} is not a directory'.format(socket_dir))
+    except FileNotFoundError:
+        os.mkdir(socket_dir)
+
+    try:
+        os.unlink(socket_path)
     except FileNotFoundError:
         pass
     s = socket.socket(family = socket.AF_UNIX, type = socket.SOCK_STREAM)
-    s.bind('/tmp/foo.ipc')
+    s.bind(socket_path)
     s.listen(10)
     while True:
         (csock, caddr) = s.accept()
@@ -131,8 +169,10 @@ def start_server():
 
         try:
             (rpc_id, r) = process_input(j)
-            csock.send(json.dumps(jsonrpc_ok(rpc_id, r)).encode('utf-8'))
-        except Exception as e:
+            r = jsonrpc_ok(rpc_id, r)
+            j = json.dumps(r).encode('utf-8')
+            csock.send(j)
+        except ValueError as e:
             # TODO: handle cases to give better error context to caller
             logg.error('process error {}'.format(e))
             csock.send(json.dumps(jsonrpc_error(j['id'], JSONRPCServerError)).encode('utf-8'))
@@ -140,22 +180,21 @@ def start_server():
         csock.close()
     s.close()
 
-    os.unlink('/tmp/foo.ipc')
+    os.unlink(socket_path)
 
 
 def init():
     global db, signer
-    secret_hex = ''
-    try:
-        secret_hex = os.environ['SIGNER_SECRET']
-    except KeyError as e:
-        raise MissingSecretError('please set the SIGNER_SECRET environment variable to a valid hex value')
+    secret_hex = config.get('SIGNER_SECRET')
+    if secret_hex == None:
+        raise MissingSecretError('please provide a valid hex value for the SIGNER_SECRET configuration variable')
 
     secret = bytes.fromhex(secret_hex)
     kw = {
             'symmetric_key': secret,
             }
-    db = ReferenceKeystore(os.environ.get('SIGNER_DATABASE', 'cic_signer'), **kw)
+    #db = ReferenceKeystore(os.environ.get('SIGNER_DATABASE', 'cic_signer'), **kw)
+    db = ReferenceKeystore(config.get('SIGNER_DATABASE'), **kw)
     signer = ReferenceSigner(db)
 
 
