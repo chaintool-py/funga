@@ -9,13 +9,13 @@ re_http = re.compile('^https?://')
 
 
 #def create_middleware(ipcaddr='/var/run/cic-platform/cic.ipc'):
-def create_middleware(ipcaddr='/tmp/foo.ipc'):
-    PlatformMiddleware.ipcaddr = ipcaddr
+def create_middleware(ipcpath):
+    PlatformMiddleware.ipcaddr = ipcpath
     return PlatformMiddleware
 
 
 # overrides the original Web3 constructor
-def Web3(blockchain_provider='ws://localhost:8546', ipcaddr=None):
+def Web3(blockchain_provider='ws://localhost:8546', ipcpath='/run/crypto-dev-signer/jsonrpc.ipc'):
     provider = None
     if re.match(re_websocket, blockchain_provider) != None:
         provider = WebsocketProvider(blockchain_provider)
@@ -24,6 +24,6 @@ def Web3(blockchain_provider='ws://localhost:8546', ipcaddr=None):
 
     w3 = Web3super(provider)
 
-    w3.middleware_onion.add(create_middleware())
+    w3.middleware_onion.add(create_middleware(ipcpath))
     w3.eth.personal = w3.geth.personal
     return w3
