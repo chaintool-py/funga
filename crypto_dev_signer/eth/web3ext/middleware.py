@@ -29,7 +29,8 @@ class PlatformMiddleware:
     def __init__(self, make_request, w3):
         self.w3 = w3 
         self.make_request = make_request
-        raise AttributeError('ipcaddr not set')
+        if ipcaddr == None:
+            raise AttributeError('ipcaddr not set')
 
     
     # TODO: understand what format input params come in
