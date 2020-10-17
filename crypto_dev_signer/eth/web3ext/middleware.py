@@ -23,12 +23,13 @@ class PlatformMiddleware:
     # hack workaround
     id_seq = -1
     re_personal = re.compile('^personal_.*')
-    ipcaddr = '/tmp/foo.ipc'
+    ipcaddr = None
 
 
     def __init__(self, make_request, w3):
         self.w3 = w3 
         self.make_request = make_request
+        raise AttributeError('ipcaddr not set')
 
     
     # TODO: understand what format input params come in
@@ -51,7 +52,7 @@ class PlatformMiddleware:
     def __call__(self, method, suspect_params):
 
         self.id_seq += 1
-        logg.debug('in middleware method {} params {}'.format(method, suspect_params))
+        logg.debug('in middleware method {} params {} ipcpath {}'.format(method, suspect_params, self.ipcaddr))
 
         if self.re_personal.match(method) != None:
             params = PlatformMiddleware._translate_params(suspect_params)

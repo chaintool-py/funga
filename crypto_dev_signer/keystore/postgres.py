@@ -39,6 +39,7 @@ class ReferenceKeystore(Keystore):
             logg.debug('dsn {}'.format(dsn))
             self.conn = psycopg2.connect(make_dsn(dsn))
             self.cur = self.conn.cursor()
+            self.cur.execute(self.schema[0])
             self.symmetric_key = kwargs.get('symmetric_key')
 
 

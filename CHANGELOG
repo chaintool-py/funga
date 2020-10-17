@@ -1,3 +1,6 @@
+* 0.2.5
+	- Add default env override
+	- Do not create middleware if ipc no set
 * 0.2.4
 	- Remove hardcoded ipc path in middleware
 * 0.2.3

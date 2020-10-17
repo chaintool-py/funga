@@ -28,28 +28,31 @@ socket_path = '/run/crypto-dev-signer/jsonrpc.ipc'
 
 argparser = argparse.ArgumentParser()
 argparser.add_argument('-c', type=str, default=config_dir, help='config file')
-argparser.add_argument('--env-prefix', dest='env_prefix', type=str, help='environment prefix for variables to overwrite configuration')
+argparser.add_argument('--env-prefix', default=os.environ.get('CONFINI_ENV_PREFIX'), dest='env_prefix', type=str, help='environment prefix for variables to overwrite configuration')
 argparser.add_argument('-i', type=int, help='default chain id for EIP155')
 argparser.add_argument('-s', type=str, help='socket path')
 argparser.add_argument('-v', action='store_true', help='be verbose')
 argparser.add_argument('-vv', action='store_true', help='be more verbose')
 args = argparser.parse_args()
 
-config = confini.Config(args.c, args.env_prefix)
-config.process()
-
 if args.vv:
     logging.getLogger().setLevel(logging.DEBUG)
 elif args.v:
     logging.getLogger().setLevel(logging.INFO)
 
+config = confini.Config(args.c, args.env_prefix)
+config.process()
+config.censor('PASSWORD', 'DATABASE')
+config.censor('SECRET', 'SIGNER')
+logg.debug('config loaded from {}:\n{}'.format(config_dir, config))
+
 if args.i:
     chainId = args.i
-
 if args.s:
     socket_path = args.s
 elif config.get('SIGNER_SOCKET_PATH'):
     socket_path = config.get('SIGNER_SOCKET_PATH')
+
 
 # connect to database
 dsn = 'postgresql://{}:{}@{}:{}/{}'.format(
@@ -59,6 +62,10 @@ dsn = 'postgresql://{}:{}@{}:{}/{}'.format(
         config.get('DATABASE_PORT'),
         config.get('DATABASE_NAME'),    
     )
+
+logg.info('using dsn {}'.format(dsn))
+logg.info('using socket {}'.format(socket_path))
+
 
 class MissingSecretError(BaseException):
 
@@ -201,8 +208,6 @@ def init():
     kw = {
             'symmetric_key': secret,
             }
-    #db = ReferenceKeystore(os.environ.get('SIGNER_DATABASE', 'cic_signer'), **kw)
-    #db = ReferenceKeystore(config.get('SIGNER_DATABASE'), **kw)
     db = ReferenceKeystore(dsn, **kw)
     signer = ReferenceSigner(db)
 
