@@ -1,9 +1,9 @@
-# CIC PLATFORM SIGNER
+# CRYPTO DEV SIGNER
 
 This package is written because at the time no good solution seemed to exist for solving the following combined requirements and issues:
 
 * A service has custody of its users' private keys.
-* The are a large number of private keys involved (tens of thousands minimum).
+* The are a large number of private keys involved (hundreds of thousands and up).
 * Need to sign transactions conforming to EIP-155, with the ability to arbitrarily specify the "chain id".
 * Do not want to store the keys inside an ethereum node, especially not the one connected to the network.
 * Want to use the "standard" web3 JSON-RPC interface, so that the component can be easily replaced later.
@@ -14,19 +14,11 @@ This package is written because at the time no good solution seemed to exist for
 
 ### Scripts
 
-Two scripts are currently available:
-
-### `crypto-dev-daemon.py`
-
-An Unix socket IPC server implementing the following web3 json-rpc methods:
+When installed with pip/setuptools, this package provides a Unix socket IPC server as `crypto-dev-daemon` implementing the following web3 json-rpc methods:
 
 * web3.eth.personal.newAccount
 * web3.eth.personal.signTransaction
 * web3.eth.signTransaction
-
-### `web3_middleware.py`
-
-Demonstrates use of the IPC server as middleware for handling calls to the web3 json-rpc methods provided by the daemon.
 
 ### Classes
 
@@ -49,9 +41,9 @@ The classes and packages provided are:
 
 ## VERSION
 
-This software is in alpha state and very brittle.
+This software is in alpha state.
 
-Current version is 0.1.0
+Current version is 0.2.5
 
 ## LICENSE
 

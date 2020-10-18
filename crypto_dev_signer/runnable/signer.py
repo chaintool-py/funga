@@ -212,7 +212,8 @@ def init():
     signer = ReferenceSigner(db)
 
 
-if __name__ == '__main__':
+#if __name__ == '__main__':
+def main():
     init()
     arg = None
     try:

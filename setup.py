@@ -1,8 +1,12 @@
 from setuptools import setup
 
+f = open('README.md', 'r')
+long_description = f.read()
+f.close()
+
 setup(
         name="crypto-dev-signer",
-        version="0.2.5",
+        version="0.2.6",
         description="A signer and keystore daemon and library for cryptocurrency software development",
         author="Louis Holbrook",
         author_email="dev@holbrook.no",
@@ -11,6 +15,7 @@ setup(
             'crypto_dev_signer.eth.web3ext',
             'crypto_dev_signer.eth',
             'crypto_dev_signer.keystore',
+            'crypto_dev_signer.runnable',
             'crypto_dev_signer',
             ],
         install_requires=[
@@ -21,11 +26,17 @@ setup(
             'pysha3',
             'rlp',
             'json-rpc',
-            'confini==0.2.1',
+            'confini==0.2.3',
             ], 
-        scripts = [
-            'scripts/crypto-dev-daemon',
-            ],
-        data_files = [('', ['LICENSE.txt'])],
+        long_description=long_description,
+        long_description_content_type='text/markdown',
+        #scripts = [
+        #    'scripts/crypto-dev-daemon',
+        #    ],
+        entry_points = {
+            'console_scripts': [
+                'crypto-dev-daemon=crypto_dev_signer.runnable.signer:main',
+                ],
+            },
         url='https://gitlab.com/nolash/crypto-dev-signer',
         )
