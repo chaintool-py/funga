@@ -26,7 +26,7 @@ setup(
             'pysha3',
             'rlp',
             'json-rpc',
-            'confini==0.2.3',
+            'confini==0.2.5',
             ], 
         long_description=long_description,
         long_description_content_type='text/markdown',

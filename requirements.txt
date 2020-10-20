@@ -1,4 +1,5 @@
 cffi==1.14.1
+confini==0.2.5
 cryptography==3.0
 cytoolz==0.10.1
 eth-hash==0.2.0
