@@ -26,7 +26,7 @@ setup(
             'pysha3',
             'rlp',
             'json-rpc',
-            'confini==0.2.5',
+            'confini==0.2.6',
             'sqlalchemy==1.3.19',
             ], 
         long_description=long_description,
