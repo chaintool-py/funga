@@ -35,19 +35,15 @@ class TestDatabase(unittest.TestCase):
         kw = {
                 'symmetric_key': self.symkey,
                 }
-        self.db = ReferenceKeystore('signer_test', **kw)
-        for ss in ReferenceKeystore.schema:
-            self.db.cur.execute(ss)
-        self.db.conn.commit()
+        self.db = ReferenceKeystore('postgres+psycopg2://postgres@localhost:5432/signer_test', **kw)
         self.address_hex = self.db.new('foo')
 
 
     def tearDown(self):
-        self.db.conn = psycopg2.connect('dbname=signer_test')
-        self.db.cur = self.db.conn.cursor()
-        self.db.cur.execute('DROP INDEX ethereum_address_idx;')
-        self.db.cur.execute('DROP TABLE ethereum;')
-        self.db.conn.commit()
+        self.db.db_session.execute('DROP INDEX ethereum_address_idx;')
+        self.db.db_session.execute('DROP TABLE ethereum;')
+        self.db.db_session.commit()
+
 
 
     def test_get_key(self):

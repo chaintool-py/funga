@@ -1,3 +1,5 @@
+* 0.3.0
+	- Implement SQLAlchemy for db backend
 * 0.2.6
 	- Upgrade confini
 * 0.2.5

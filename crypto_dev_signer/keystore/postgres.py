@@ -4,9 +4,11 @@ import base64
 
 # third-party imports
 from cryptography.fernet import Fernet
-import psycopg2
-from psycopg2 import sql
-from psycopg2.extensions import make_dsn
+#import psycopg2
+#from psycopg2 import sql
+#from psycopg2.extensions import make_dsn
+from sqlalchemy import create_engine, text
+from sqlalchemy.orm import sessionmaker
 import sha3
 
 # local imports
@@ -36,18 +38,28 @@ class ReferenceKeystore(Keystore):
     ]
 
         def __init__(self, dsn, **kwargs):
-            logg.debug('dsn {}'.format(dsn))
-            self.conn = psycopg2.connect(make_dsn(dsn))
-            self.cur = self.conn.cursor()
-            self.cur.execute(self.schema[0])
+            logg.debug('starting db session with dsn {}'.format(dsn))
+            self.db_engine = create_engine(dsn)
+            self.db_session = sessionmaker(bind=self.db_engine)()
+            for s in self.schema:
+                self.db_session.execute(s)
+            self.db_session.commit()
             self.symmetric_key = kwargs.get('symmetric_key')
+
+
+        def __del__(self):
+            logg.debug('closing db session')
+            self.db_session.close()
 
 
         def get(self, address, password=None):
             safe_address = strip_hex_prefix(address)
-            s = sql.SQL('SELECT key_ciphertext FROM ethereum WHERE wallet_address_hex = %s')
-            self.cur.execute(s, [ safe_address ] )
-            k = self.cur.fetchone()[0]
+            s = text('SELECT key_ciphertext FROM ethereum WHERE wallet_address_hex = :a')
+            r = self.db_session.execute(s, {
+                'a': safe_address,
+                },
+                )
+            k = r.first()[0]
             return self._decrypt(k, password)
 
 
@@ -55,11 +67,14 @@ class ReferenceKeystore(Keystore):
             pubk = keyapi.private_key_to_public_key(pk)
             address_hex = pubk.to_checksum_address()
             address_hex_clean = strip_hex_prefix(address_hex)
-            logg.debug('importing address {}'.format(address_hex_clean))
             c = self._encrypt(pk.to_bytes(), password)
-            s = sql.SQL('INSERT INTO ethereum (wallet_address_hex, key_ciphertext) VALUES (%s, %s)')
-            self.cur.execute(s, [ address_hex_clean, c.decode('utf-8') ])
-            self.conn.commit()
+            s = text('INSERT INTO ethereum (wallet_address_hex, key_ciphertext) VALUES (:a, :c)') #%s, %s)')
+            self.db_session.execute(s, {
+                'a': address_hex_clean,
+                'c': c.decode('utf-8'),
+                },
+                )
+            self.db_session.commit()
             return address_hex
 
 
@@ -81,10 +96,3 @@ class ReferenceKeystore(Keystore):
         def _decrypt(self, c, password):
             f = self._generate_encryption_engine(password)
             return f.decrypt(c.encode('utf-8'))
-             
-
-        def __del__(self):
-            logg.debug('closing database')
-            self.conn.commit()
-            self.cur.close()
-            self.conn.close()
