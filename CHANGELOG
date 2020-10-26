@@ -1,3 +1,7 @@
+* 0.4.0
+	- Handle hex inputs for int values in transaction dict
+	- Change signature for Web3 constructor to take provider instead of url
+	- Add script for importing private key from hex
 * 0.3.0
 	- Implement SQLAlchemy for db backend
 * 0.2.6

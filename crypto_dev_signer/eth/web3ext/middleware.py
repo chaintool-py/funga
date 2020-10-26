@@ -38,11 +38,11 @@ class PlatformMiddleware:
     # dict input comes as [{}] and fails if not passed on as an array
     @staticmethod
     def _translate_params(params):
-        if params.__class__.__name__ == 'tuple':
-            r = []
-            for p in params:
-                r.append(p)
-            return r
+        #if params.__class__.__name__ == 'tuple':
+        #    r = []
+        #    for p in params:
+        #        r.append(p)
+        #    return r
 
         if params.__class__.__name__ == 'list' and len(params) > 0:
             return params[0]
@@ -64,7 +64,7 @@ class PlatformMiddleware:
             ipc_provider_workaround = s.connect(self.ipcaddr)
 
             logg.info('redirecting method {}  params {} original params {}'.format(method, params, suspect_params))
-            o = jsonrpc_request(method, params)
+            o = jsonrpc_request(method, params[0])
             j = json.dumps(o)
             logg.debug('send {}'.format(j))
             s.send(j.encode('utf-8'))
@@ -81,8 +81,8 @@ class PlatformMiddleware:
             params = PlatformMiddleware._translate_params(suspect_params)
             s = socket.socket(family=socket.AF_UNIX, type=socket.SOCK_STREAM, proto=0)
             ipc_provider_workaround = s.connect(self.ipcaddr)
-            logg.info('redirecting method {}  params {} original params {}'.format(method, params, suspect_params))
-            o = jsonrpc_request(method, params)
+            logg.info('redirecting methodd {}  params {} original params {}'.format(method, params, suspect_params))
+            o = jsonrpc_request(method, params[0])
             j = json.dumps(o)
             logg.debug('send {}'.format(j))
             s.send(j.encode('utf-8'))

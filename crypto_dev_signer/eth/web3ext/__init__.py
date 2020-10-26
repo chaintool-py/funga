@@ -17,13 +17,8 @@ def create_middleware(ipcpath):
 
 
 # overrides the original Web3 constructor
-def Web3(blockchain_provider='ws://localhost:8546', ipcpath=None):
-    provider = None
-    if re.match(re_websocket, blockchain_provider) != None:
-        provider = WebsocketProvider(blockchain_provider)
-    elif re.match(re_http, blockchain_provider) != None:
-        provider = HTTPProvider(blockchain_provider)
-
+#def Web3(blockchain_provider='ws://localhost:8546', ipcpath=None):
+def Web3(provider, ipcpath=None):
     w3 = Web3super(provider)
 
     if ipcpath != None:

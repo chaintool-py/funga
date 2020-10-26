@@ -27,11 +27,35 @@ class EIP155Transaction:
         to = binascii.unhexlify(strip_hex_prefix(tx['to']))
         data = binascii.unhexlify(strip_hex_prefix(tx['data']))
 
+        gas_price = None
+        start_gas = None
+        value = None
+
+        try:
+            gas_price = int(tx['gasPrice'])
+        except ValueError:
+            gas_price = int(tx['gasPrice'], 16)
+
+        try:
+            start_gas = int(tx['gas'])
+        except ValueError:
+            start_gas = int(tx['gas'], 16)
+
+        try:
+            value = int(tx['value'])
+        except ValueError:
+            value = int(tx['value'], 16)
+
+        try:
+            nonce = int(nonce)
+        except ValueError:
+            nonce = int(nonce, 16)
+
         self.nonce = nonce
-        self.gas_price = int(tx['gasPrice'])
-        self.start_gas = int(tx['gas'])
+        self.gas_price = gas_price
+        self.start_gas = start_gas
         self.to = to
-        self.value = int(tx['value'])
+        self.value = value
         self.data = data
         self.v = chainId
         self.r = b''

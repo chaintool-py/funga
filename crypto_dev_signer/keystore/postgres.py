@@ -75,6 +75,7 @@ class ReferenceKeystore(Keystore):
                 },
                 )
             self.db_session.commit()
+            logg.info('added private key for address {}'.format(address_hex_clean))
             return address_hex
 
 

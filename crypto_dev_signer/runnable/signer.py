@@ -97,6 +97,7 @@ def personal_new_account(p):
 
 
 def personal_sign_transaction(p):
+    logg.debug('got {} to sign'.format(p[0]))
     t = EIP155Transaction(p[0], p[0]['nonce'], 8995)
     z = signer.signTransaction(t, p[1])
     raw_signed_tx = t.rlp_serialize()
@@ -212,7 +213,6 @@ def init():
     signer = ReferenceSigner(db)
 
 
-#if __name__ == '__main__':
 def main():
     init()
     arg = None
@@ -226,3 +226,7 @@ def main():
     (rpc_id, response) = process_input(arg)
     r = jsonrpc_ok(rpc_id, response)
     sys.stdout.write(json.dumps(r))
+
+
+if __name__ == '__main__':
+    main()

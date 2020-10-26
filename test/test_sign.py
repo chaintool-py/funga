@@ -12,12 +12,23 @@ logging.basicConfig(level=logging.DEBUG)
 logg = logging.getLogger()
 
 
-tx = {
+tx_ints = {
+    'nonce': 0,
     'from': "0xEB014f8c8B418Db6b45774c326A0E64C78914dC0",
     'gasPrice': "20000000000",
-    'gas': "22000",
+    'gas': "21000",
     'to': '0x3535353535353535353535353535353535353535',
     'value': "1000",
+    'data': "deadbeef",
+}
+
+tx_hexs = {
+    'nonce': '0x0',
+    'from': "0xEB014f8c8B418Db6b45774c326A0E64C78914dC0",
+    'gasPrice': "0x4a817c800",
+    'gas': "0x5208",
+    'to': '0x3535353535353535353535353535353535353535',
+    'value': "0x3e8",
     'data': "deadbeef",
 }
 
@@ -54,17 +65,24 @@ class TestSign(unittest.TestCase):
 
     # TODO: verify rlp tx output
     def test_serialize_transaction(self):
-        t = EIP155Transaction(tx, 0)
+        t = EIP155Transaction(tx_ints, 0)
         self.assertRegex(t.__class__.__name__, "Transaction")
         s = t.serialize()
-        self.assertEqual('{}'.format(s), "{'nonce': '0x0', 'gasPrice': '0x4a817c800', 'gas': '0x55f0', 'to': '0x3535353535353535353535353535353535353535', 'value': '0x3e8', 'data': '0xdeadbeef', 'v': '0x1', 'r': '', 's': ''}")
+        self.assertEqual('{}'.format(s), "{'nonce': '0x0', 'gasPrice': '0x4a817c800', 'gas': '0x5208', 'to': '0x3535353535353535353535353535353535353535', 'value': '0x3e8', 'data': '0xdeadbeef', 'v': '0x1', 'r': '', 's': ''}")
         r = t.rlp_serialize()
-        self.assertEqual(r.hex(), 'ea808504a817c8008255f09435353535353535353535353535353535353535358203e884deadbeef018080')
+        self.assertEqual(r.hex(), 'ea808504a817c8008252089435353535353535353535353535353535353535358203e884deadbeef018080')
+
+        t = EIP155Transaction(tx_hexs, 0)
+        self.assertRegex(t.__class__.__name__, "Transaction")
+        s = t.serialize()
+        self.assertEqual('{}'.format(s), "{'nonce': '0x0', 'gasPrice': '0x4a817c800', 'gas': '0x5208', 'to': '0x3535353535353535353535353535353535353535', 'value': '0x3e8', 'data': '0xdeadbeef', 'v': '0x1', 'r': '', 's': ''}")
+        r = t.rlp_serialize()
+        self.assertEqual(r.hex(), 'ea808504a817c8008252089435353535353535353535353535353535353535358203e884deadbeef018080')
 
 
 
     def test_sign_transaction(self):
-        t = EIP155Transaction(tx, 461, 8995)
+        t = EIP155Transaction(tx_ints, 461, 8995)
         s = ReferenceSigner(self.pk_getter)
         z = s.signTransaction(t)
 
