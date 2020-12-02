@@ -1,3 +1,5 @@
+* 0.4.1
+	- Make dependency versions explicit in setup
 * 0.4.0
 	- Handle hex inputs for int values in transaction dict
 	- Change signature for Web3 constructor to take provider instead of url
