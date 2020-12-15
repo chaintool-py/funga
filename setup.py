@@ -6,7 +6,7 @@ f.close()
 
 setup(
         name="crypto-dev-signer",
-        version="0.4.1",
+        version="0.4.2",
         description="A signer and keystore daemon and library for cryptocurrency software development",
         author="Louis Holbrook",
         author_email="dev@holbrook.no",
@@ -24,7 +24,7 @@ setup(
             'cryptography==3.2.1',
             'eth-keys==0.3.3',
             'pysha3==1.0.2',
-            'rlp==1.2.0',
+            'rlp==2.0.1',
             'json-rpc==1.13.0',
             'confini==0.3.2',
             'sqlalchemy==1.3.20',
