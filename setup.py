@@ -4,9 +4,27 @@ f = open('README.md', 'r')
 long_description = f.read()
 f.close()
 
+requirements = []
+f = open('requirements.txt', 'r')
+while True:
+    l = f.readline()
+    if l == '':
+        break
+    requirements.append(l.rstrip())
+f.close()
+
+test_requirements = []
+f = open('test_requirements.txt', 'r')
+while True:
+    l = f.readline()
+    if l == '':
+        break
+    test_requirements.append(l.rstrip())
+f.close()
+
 setup(
         name="crypto-dev-signer",
-        version="0.4.2",
+        version="0.4.3",
         description="A signer and keystore daemon and library for cryptocurrency software development",
         author="Louis Holbrook",
         author_email="dev@holbrook.no",
@@ -18,17 +36,8 @@ setup(
             'crypto_dev_signer.runnable',
             'crypto_dev_signer',
             ],
-        install_requires=[
-            'web3==5.12.2',
-            'psycopg2==2.8.6',
-            'cryptography==3.2.1',
-            'eth-keys==0.3.3',
-            'pysha3==1.0.2',
-            'rlp==2.0.1',
-            'json-rpc==1.13.0',
-            'confini==0.3.2',
-            'sqlalchemy==1.3.20',
-            ], 
+        install_requires=requirements,
+        tests_require=test_requirements,
         long_description=long_description,
         long_description_content_type='text/markdown',
         #scripts = [
