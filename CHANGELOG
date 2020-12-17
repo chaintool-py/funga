@@ -1,3 +1,5 @@
+* 0.4.4
+	- Upgrade dependencies
 * 0.4.3
 	- Align rlp dependency to solve discrepancy in eth-tester/py-evm dependencies
 * 0.4.2
