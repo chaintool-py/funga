@@ -87,5 +87,10 @@ class TestSign(unittest.TestCase):
         z = s.signTransaction(t)
 
 
+    def test_sign_message(self):
+        s = ReferenceSigner(self.pk_getter)
+        z = s.signEthereumMessage(tx_ints['from'], 'foo')
+
+
 if __name__ == '__main__':
     unittest.main()

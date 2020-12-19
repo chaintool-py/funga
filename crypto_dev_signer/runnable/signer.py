@@ -118,7 +118,13 @@ methods = {
         'personal_newAccount': personal_new_account,
         'personal_signTransaction': personal_sign_transaction,
         'eth_signTransaction': eth_signTransaction,
+        'eth_sign': eth_sign,
     }
+
+
+def eth_sign(address, message):
+    logg.debug('got message {} to sign'.format(p[0]))
+    return signer.signEthereumMessage(address, message)
 
 
 def jsonrpc_error(rpc_id, err):
