@@ -15,6 +15,7 @@ from jsonrpc.exceptions import *
 from crypto_dev_signer.eth.signer import ReferenceSigner
 from crypto_dev_signer.eth.transaction import EIP155Transaction
 from crypto_dev_signer.keystore import ReferenceKeystore
+from crypto_dev_signer.error import UnknownAccountError
 
 #logging.basicConfig(level=logging.DEBUG)
 logg = logging.getLogger()
@@ -197,6 +198,9 @@ def start_server():
         except ValueError as e:
             # TODO: handle cases to give better error context to caller
             logg.error('process error {}'.format(e))
+            csock.send(json.dumps(jsonrpc_error(j['id'], JSONRPCServerError)).encode('utf-8'))
+        except UnknownAccountError as e:
+            logg.error('process unknown account error {}'.format(e))
             csock.send(json.dumps(jsonrpc_error(j['id'], JSONRPCServerError)).encode('utf-8'))
 
         csock.close()

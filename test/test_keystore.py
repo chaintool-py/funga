@@ -4,6 +4,7 @@
 import unittest
 import logging
 import base64
+import os
 
 # third-party imports
 import psycopg2
@@ -12,6 +13,7 @@ from cryptography.fernet import Fernet, InvalidToken
 
 # local imports
 from crypto_dev_signer.keystore import ReferenceKeystore
+from crypto_dev_signer.error import UnknownAccountError
 
 logging.basicConfig(level=logging.DEBUG)
 logg = logging.getLogger()
@@ -51,6 +53,10 @@ class TestDatabase(unittest.TestCase):
         self.db.get(self.address_hex, 'foo')
         with self.assertRaises(InvalidToken):
            self.db.get(self.address_hex, 'bar')
+
+        bogus_account = '0x' + os.urandom(20).hex()
+        with self.assertRaises(UnknownAccountError):
+           self.db.get(bogus_account, 'bar')
 
 
 if __name__ == '__main__':

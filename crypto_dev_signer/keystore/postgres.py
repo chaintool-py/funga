@@ -15,6 +15,7 @@ import sha3
 from .interface import Keystore
 from crypto_dev_signer.common import strip_hex_prefix
 from . import keyapi
+from crypto_dev_signer.error import UnknownAccountError
 
 logging.basicConfig(level=logging.DEBUG)
 logg = logging.getLogger(__file__)
@@ -59,7 +60,10 @@ class ReferenceKeystore(Keystore):
                 'a': safe_address,
                 },
                 )
-            k = r.first()[0]
+            try:
+                k = r.first()[0]
+            except TypeError:
+                raise UnknownAccountError(address)
             return self._decrypt(k, password)
 
 
