@@ -46,8 +46,10 @@ class ReferenceSigner(Signer):
         #z = keys.ecdsa_sign(message_hash=g, private_key=k)
         z = None
         if type(message).__name__ == 'str':
+            logg.debug('signing message in "str" format: {}'.format(message))
             z = k.sign_msg(message.encode('utf-8'))
         elif type(message).__name__ == 'bytes':
+            logg.debug('signing message in "bytes" format: {}'.format(message.hex()))
             z = k.sign_msg(message)
         else:
             raise ValueError('message must be type str or bytes, received {}'.format(type(message).__name__))
