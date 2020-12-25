@@ -44,6 +44,12 @@ class ReferenceSigner(Signer):
         #msg = b'\x19Ethereum Signed Message:\n{}{}'.format(len(message), message)
         k = keys.PrivateKey(self.keyGetter.get(address, password))
         #z = keys.ecdsa_sign(message_hash=g, private_key=k)
-        z = k.sign_msg(message.encode('utf-8'))
+        z = None
+        if type(message).__name__ == 'str':
+            z = k.sign_msg(message.encode('utf-8'))
+        elif type(message).__name__ == 'bytes':
+            z = k.sign_msg(message)
+        else:
+            raise ValueError('message must be type str or bytes, received {}'.format(type(message).__name__))
         return z
 
