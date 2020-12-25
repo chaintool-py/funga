@@ -117,7 +117,10 @@ def eth_signTransaction(tx):
 
 def eth_sign(address, message):
     logg.debug('got message {} to sign'.format(p[0]))
-    return signer.signEthereumMessage(address, message)
+    message_type = type(message).__name__
+    if message_type != 'str':
+        raise ValueError('invalid message format, must be {}, not {}'.format(message_type))
+    return signer.signEthereumMessage(address, message.encode('utf-8'))
 
 
 methods = {
