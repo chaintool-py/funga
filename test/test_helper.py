@@ -23,6 +23,9 @@ class MockEthTxBackend:
     def reporter(self, tx):
         logg.debug('reporter {}'.format(tx))
 
+    def verifier(self, rcpt):
+        logg.debug('reporter {}'.format(rcpt))
+
     def fee_price_helper(self):
         return 21
 
@@ -30,19 +33,18 @@ class MockEthTxBackend:
         logg.debug('fee helper code {} inputs {}'.format(code, inputs))
         return 2
 
-    def builder(self, a, b):
-        b = {
-            'from': a['from'],
+    def builder(self, tx):
+        return {
+            'from': tx['from'],
             'to': '0x' + os.urandom(20).hex(),
             'data': '',
-            'gasPrice': a['feePrice'],
-            'gas': a['fee'],
+            'gasPrice': tx['feePrice'],
+            'gas': tx['feeUnits'],
             }
-        return b
         
-    def builder_two(self, a, b):
-        b['value'] = 1024
-        return b
+    def builder_two(self, tx):
+        tx['value'] = 1024
+        return tx
 
 
 class TestHelper(unittest.TestCase):
@@ -50,8 +52,9 @@ class TestHelper(unittest.TestCase):
     def setUp(self):
         logg.debug('setup')
         self.db = DictKeystore()
-
-        keystore_filepath = os.path.join(script_dir, 'testdata', 'UTC--2021-01-08T18-37-01.187235289Z--00a329c0648769a73afac7f9381e08fb43dbea72')
+        
+        keystore_filename = 'UTC--2021-01-08T18-37-01.187235289Z--00a329c0648769a73afac7f9381e08fb43dbea72'
+        keystore_filepath = os.path.join(script_dir, 'testdata', keystore_filename)
 
         self.address_hex = self.db.import_keystore_file(keystore_filepath, '')
         self.signer = ReferenceSigner(self.db)
@@ -63,7 +66,7 @@ class TestHelper(unittest.TestCase):
 
     def test_helper(self):
         backend = MockEthTxBackend()
-        executor = TxExecutor(self.address_hex, self.signer, backend.dispatcher, backend.reporter, 666, 13, backend.fee_helper, backend.fee_price_helper)    
+        executor = TxExecutor(self.address_hex, self.signer, backend.dispatcher, backend.reporter, 666, 13, backend.fee_helper, backend.fee_price_helper, backend.verifier)    
 
         tx_ish = {'from': self.address_hex}
         executor.sign_and_send([backend.builder, backend.builder_two])

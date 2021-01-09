@@ -1,5 +1,6 @@
 # standard imports
 import logging
+import time
 
 # third-party imports
 from crypto_dev_signer.eth.transaction import EIP155Transaction
@@ -12,7 +13,7 @@ logg = logging.getLogger()
 
 class TxExecutor:
 
-    def __init__(self, sender, signer, dispatcher, reporter, nonce, chain_id, fee_helper, fee_price_helper, block=False):
+    def __init__(self, sender, signer, dispatcher, reporter, nonce, chain_id, fee_helper=None, fee_price_helper=None, verifier=None, block=False):
         self.sender = sender
         self.nonce = nonce
         self.signer = signer
@@ -21,8 +22,27 @@ class TxExecutor:
         self.block = bool(block)
         self.chain_id = chain_id
         self.tx_hashes = []
-        self.fee_price_helper = fee_price_helper
+        if fee_helper == None:
+            fee_helper = self.noop_fee_helper
         self.fee_helper = fee_helper
+        if fee_price_helper == None:
+            fee_price_helper = self.noop_fee_price_helper
+        self.fee_price_helper = fee_price_helper
+        if verifier == None:
+            verifier = self.noop_verifier
+        self.verifier = verifier
+
+
+    def noop_fee_helper(self, sender, code, inputs):
+        return 1
+
+
+    def noop_fee_price_helper(self):
+        return 1
+
+
+    def noop_verifier(self, rcpt):
+        return rcpt
 
 
     def sign_and_send(self, builder, force_wait=False):
@@ -31,13 +51,14 @@ class TxExecutor:
         tx_tpl = {
             'from': self.sender,
             'chainId': self.chain_id,
-            'fee': fee_units,
+            'feeUnits': fee_units,
             'feePrice': self.fee_price_helper(),
             'nonce': self.nonce,
             }
-        tx = None
+
+        tx = tx_tpl
         for b in builder:
-            tx = b(tx_tpl, tx)
+            tx = b(tx)
 
         logg.debug('from {} nonce {} tx {}'.format(self.sender, self.nonce, tx))
 
@@ -50,7 +71,6 @@ class TxExecutor:
         rcpt = None
         if self.block or force_wait:
             rcpt = self.wait_for(tx_hash)
-            logg.info('tx {} fee used: {}'.format(tx_hash.hex(), rcpt['feeUsed']))
         return (tx_hash.hex(), rcpt)
 
 
@@ -62,10 +82,8 @@ class TxExecutor:
             try:
                 #return self.w3.eth.getTransactionReceipt(tx_hash)
                 return self.reporter(tx_hash)
-            except web3.exceptions.TransactionNotFound:
+            except Exception:
                 logg.debug('poll #{} for {}'.format(i, tx_hash.hex()))   
                 i += 1
                 time.sleep(1)
-        if rcpt['status'] == 0:
-            raise TransactionRevertError(tx_hash)
-        return rcpt
+        return self.verifier(rcpt)
