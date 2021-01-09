@@ -14,6 +14,7 @@ from cryptography.fernet import Fernet, InvalidToken
 # local imports
 from crypto_dev_signer.keystore import DictKeystore
 from crypto_dev_signer.error import UnknownAccountError
+from crypto_dev_signer.eth.signer import ReferenceSigner
 
 logging.basicConfig(level=logging.DEBUG)
 logg = logging.getLogger()
@@ -45,7 +46,7 @@ class TestDatabase(unittest.TestCase):
         #s = f.read()
         #f.close()
 
-        self.address_hex = self.db.import_keystore_file(keystore_filepath, '')[2:]
+        self.address_hex = self.db.import_keystore_file(keystore_filepath, '')
 
 
     def tearDown(self): 
@@ -53,14 +54,21 @@ class TestDatabase(unittest.TestCase):
 
 
     def test_get_key(self):
-        logg.debug('getting {}'.format(self.address_hex))
-        pk = self.db.get(self.address_hex, '')
+        logg.debug('getting {}'.format(self.address_hex[2:]))
+        pk = self.db.get(self.address_hex[2:], '')
 
-        self.assertEqual(pk.public_key.to_checksum_address()[2:], self.address_hex)
+        self.assertEqual(self.address_hex.lower(), '0x00a329c0648769a73afac7f9381e08fb43dbea72')
 
         bogus_account = os.urandom(20).hex()
         with self.assertRaises(UnknownAccountError):
            self.db.get(bogus_account, '')
+
+    
+    def test_sign_message(self):
+        s = ReferenceSigner(self.db)
+        z = s.signEthereumMessage(self.address_hex[2:], b'foo')
+        logg.debug('zzz {}'.format(str(z)))
+
 
 
 if __name__ == '__main__':
