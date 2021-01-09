@@ -47,7 +47,7 @@ class ReferenceSigner(Signer):
         z = None
         if type(message).__name__ == 'str':
             logg.debug('signing message in "str" format: {}'.format(message))
-            z = k.sign_msg(message.encode('utf-8'))
+            z = k.sign_msg(bytes.fromhex(message))
         elif type(message).__name__ == 'bytes':
             logg.debug('signing message in "bytes" format: {}'.format(message.hex()))
             z = k.sign_msg(message)

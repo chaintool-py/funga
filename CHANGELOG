@@ -1,4 +1,11 @@
-- 0.4.10
+* 0.4.13-unreleased
+	- Implement DictKeystore
+	- Remove unused insert_key method in keystore interface
+* 0.4.12
+	- Enforce hex strings in signer backend for sign message
+* 0.4.11
+	- Add missing middleware param for eth_sign method
+* 0.4.10
 	- Add bytes and string handling in inner signer backend
 * 0.4.9
 	- Accept string message format for message signing

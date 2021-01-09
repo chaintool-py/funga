@@ -91,6 +91,7 @@ class TestSign(unittest.TestCase):
         s = ReferenceSigner(self.pk_getter)
         z = s.signEthereumMessage(tx_ints['from'], 'foo')
         z = s.signEthereumMessage(tx_ints['from'], b'foo')
+        logg.debug('zzz {}'.format(str(z)))
 
 
 if __name__ == '__main__':

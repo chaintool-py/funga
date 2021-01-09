@@ -99,7 +99,7 @@ class PlatformMiddleware:
             s = socket.socket(family=socket.AF_UNIX, type=socket.SOCK_STREAM, proto=0)
             ipc_provider_workaround = s.connect(self.ipcaddr)
             logg.info('redirecting method {}  params {} original params {}'.format(method, params, suspect_params))
-            o = jsonrpc_request(method, params[0], params[1])
+            o = jsonrpc_request(method, params)
             j = json.dumps(o)
             logg.debug('send {}'.format(j))
             s.send(j.encode('utf-8'))

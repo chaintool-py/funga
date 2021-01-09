@@ -120,7 +120,8 @@ def eth_sign(p):
     message_type = type(p[1]).__name__
     if message_type != 'str':
         raise ValueError('invalid message format, must be {}, not {}'.format(message_type))
-    return signer.signEthereumMessage(p[0], p[1].encode('utf-8'))
+    z = signer.signEthereumMessage(p[0], p[1][2:])
+    return str(z)
 
 
 methods = {
