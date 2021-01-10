@@ -3,10 +3,14 @@ import unittest
 import logging
 import os
 
+# third-party imports
+import web3
+
 # local imports
 from crypto_dev_signer.keystore import DictKeystore
 from crypto_dev_signer.eth.signer import ReferenceSigner
 from crypto_dev_signer.helper import TxExecutor
+from crypto_dev_signer.eth.helper import EthTxExecutor
 
 logging.basicConfig(level=logging.DEBUG)
 logg = logging.getLogger()
@@ -29,21 +33,23 @@ class MockEthTxBackend:
     def fee_price_helper(self):
         return 21
 
-    def fee_helper(self, sender, code, inputs):
-        logg.debug('fee helper code {} inputs {}'.format(code, inputs))
+    def fee_helper(self, tx):
+        logg.debug('fee helper tx {}'.format(tx))
         return 2
 
     def builder(self, tx):
-        return {
-            'from': tx['from'],
-            'to': '0x' + os.urandom(20).hex(),
-            'data': '',
-            'gasPrice': tx['feePrice'],
-            'gas': tx['feeUnits'],
-            }
+        return tx
         
     def builder_two(self, tx):
-        tx['value'] = 1024
+        tx['value'] = 10243
+        tx['to'] = web3.Web3.toChecksumAddress('0x' + os.urandom(20).hex())
+        tx['data'] = ''
+        if tx.get('feePrice') != None:
+            tx['gasPrice'] = tx['feePrice']
+            del tx['feePrice']
+        if tx.get('feeUnits') != None:
+            tx['gas'] = tx['feeUnits']
+            del tx['feeUnits']
         return tx
 
 
@@ -66,10 +72,21 @@ class TestHelper(unittest.TestCase):
 
     def test_helper(self):
         backend = MockEthTxBackend()
-        executor = TxExecutor(self.address_hex, self.signer, backend.dispatcher, backend.reporter, 666, 13, backend.fee_helper, backend.fee_price_helper, backend.verifier)    
+        executor = TxExecutor(self.address_hex, self.signer, backend.builder, backend.dispatcher, backend.reporter, 666, 13, backend.fee_helper, backend.fee_price_helper, backend.verifier)    
 
         tx_ish = {'from': self.address_hex}
-        executor.sign_and_send([backend.builder, backend.builder_two])
+        executor.sign_and_send([backend.builder_two])
+
+
+    def test_eth_helper(self):
+        backend = MockEthTxBackend()
+        w3 = web3.Web3(web3.Web3.HTTPProvider('http://localhost:8545'))
+        executor = EthTxExecutor(w3, self.address_hex, self.signer, 8996)
+
+        tx_ish = {'from': self.address_hex}
+        #executor.sign_and_send([backend.builder, backend.builder_two])
+        with self.assertRaises(ValueError): 
+            executor.sign_and_send([backend.builder_two])
 
 
 if __name__ == '__main__':

@@ -1,7 +1,7 @@
 * 0.4.13-unreleased
 	- Implement DictKeystore
 	- Remove unused insert_key method in keystore interface
-	- Add transaction executor helper
+	- Add transaction executor helper, with adapter helper for eth
 * 0.4.12
 	- Enforce hex strings in signer backend for sign message
 * 0.4.11

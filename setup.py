@@ -24,13 +24,14 @@ f.close()
 
 setup(
         name="crypto-dev-signer",
-        version="0.4.13b1",
+        version="0.4.13b2",
         description="A signer and keystore daemon and library for cryptocurrency software development",
         author="Louis Holbrook",
         author_email="dev@holbrook.no",
         packages=[
             'crypto_dev_signer.eth.signer',
             'crypto_dev_signer.eth.web3ext',
+            'crypto_dev_signer.eth.helper',
             'crypto_dev_signer.eth',
             'crypto_dev_signer.keystore',
             'crypto_dev_signer.runnable',

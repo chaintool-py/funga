@@ -13,8 +13,9 @@ logg = logging.getLogger()
 
 class TxExecutor:
 
-    def __init__(self, sender, signer, dispatcher, reporter, nonce, chain_id, fee_helper=None, fee_price_helper=None, verifier=None, block=False):
+    def __init__(self, sender, signer, translator, dispatcher, reporter, nonce, chain_id, fee_helper=None, fee_price_helper=None, verifier=None, block=False):
         self.sender = sender
+        self.translator = translator
         self.nonce = nonce
         self.signer = signer
         self.dispatcher = dispatcher
@@ -33,7 +34,7 @@ class TxExecutor:
         self.verifier = verifier
 
 
-    def noop_fee_helper(self, sender, code, inputs):
+    def noop_fee_helper(self, tx):
         return 1
 
 
@@ -45,20 +46,28 @@ class TxExecutor:
         return rcpt
 
 
+    def noop_translator(self, tx):
+        return tx
+
+
     def sign_and_send(self, builder, force_wait=False):
-        fee_units = self.fee_helper(self.sender, None, None) 
+
+        fee_price = self.fee_price_helper()
 
         tx_tpl = {
             'from': self.sender,
             'chainId': self.chain_id,
-            'feeUnits': fee_units,
-            'feePrice': self.fee_price_helper(),
+            'feeUnits': 0, #fee_units,
+            'feePrice': fee_price,
             'nonce': self.nonce,
             }
 
-        tx = tx_tpl
+        tx = self.translator(tx_tpl)
         for b in builder:
             tx = b(tx)
+
+        tx['feeUnits'] = self.fee_helper(tx)
+        tx = self.translator(tx)
 
         logg.debug('from {} nonce {} tx {}'.format(self.sender, self.nonce, tx))
 
