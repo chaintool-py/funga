@@ -68,14 +68,14 @@ class TestSign(unittest.TestCase):
         t = EIP155Transaction(tx_ints, 0)
         self.assertRegex(t.__class__.__name__, "Transaction")
         s = t.serialize()
-        self.assertEqual('{}'.format(s), "{'nonce': '0x0', 'gasPrice': '0x4a817c800', 'gas': '0x5208', 'to': '0x3535353535353535353535353535353535353535', 'value': '0x3e8', 'data': '0xdeadbeef', 'v': '0x1', 'r': '', 's': ''}")
+        self.assertEqual('{}'.format(s), "{'nonce': '', 'gasPrice': '0x04a817c800', 'gas': '0x5208', 'to': '0x3535353535353535353535353535353535353535', 'value': '0x03e8', 'data': '0xdeadbeef', 'v': '0x01', 'r': '', 's': ''}")
         r = t.rlp_serialize()
         self.assertEqual(r.hex(), 'ea808504a817c8008252089435353535353535353535353535353535353535358203e884deadbeef018080')
 
         t = EIP155Transaction(tx_hexs, 0)
         self.assertRegex(t.__class__.__name__, "Transaction")
         s = t.serialize()
-        self.assertEqual('{}'.format(s), "{'nonce': '0x0', 'gasPrice': '0x4a817c800', 'gas': '0x5208', 'to': '0x3535353535353535353535353535353535353535', 'value': '0x3e8', 'data': '0xdeadbeef', 'v': '0x1', 'r': '', 's': ''}")
+        self.assertEqual('{}'.format(s), "{'nonce': '', 'gasPrice': '0x04a817c800', 'gas': '0x5208', 'to': '0x3535353535353535353535353535353535353535', 'value': '0x03e8', 'data': '0xdeadbeef', 'v': '0x01', 'r': '', 's': ''}")
         r = t.rlp_serialize()
         self.assertEqual(r.hex(), 'ea808504a817c8008252089435353535353535353535353535353535353535358203e884deadbeef018080')
 

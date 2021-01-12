@@ -34,7 +34,10 @@ class ReferenceSigner(Signer):
         g = h.digest()
         k = keys.PrivateKey(self.keyGetter.get(tx.sender, password))
         z = keys.ecdsa_sign(message_hash=g, private_key=k)
-        tx.v = (tx.v * 2) + 35 + z[64]
+        vnum = int.from_bytes(tx.v, 'big')
+        v = (vnum * 2) + 35 + z[64]
+        byts = ((v.bit_length()-1)/8)+1
+        tx.v = v.to_bytes(int(byts), 'big')
         tx.r = z[:32]
         tx.s = z[32:64]
         return z
