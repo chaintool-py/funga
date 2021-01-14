@@ -99,7 +99,8 @@ def personal_new_account(p):
 
 def personal_sign_transaction(p):
     logg.debug('got {} to sign'.format(p[0]))
-    t = EIP155Transaction(p[0], p[0]['nonce'], 8995)
+    #t = EIP155Transaction(p[0], p[0]['nonce'], 8995)
+    t = EIP155Transaction(p[0], p[0]['nonce'], int(p[0]['chainId']))
     z = signer.signTransaction(t, p[1])
     raw_signed_tx = t.rlp_serialize()
     o = {

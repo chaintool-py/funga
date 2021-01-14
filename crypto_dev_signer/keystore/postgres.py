@@ -17,7 +17,6 @@ from crypto_dev_signer.common import strip_hex_prefix
 from . import keyapi
 from crypto_dev_signer.error import UnknownAccountError
 
-logging.basicConfig(level=logging.DEBUG)
 logg = logging.getLogger(__file__)
 
 
