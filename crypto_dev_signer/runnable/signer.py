@@ -17,10 +17,10 @@ from crypto_dev_signer.eth.transaction import EIP155Transaction
 from crypto_dev_signer.keystore import ReferenceKeystore
 from crypto_dev_signer.error import UnknownAccountError
 
-#logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.WARNING)
 logg = logging.getLogger()
 
-config_dir = os.path.join('/usr/local/etc/cic-eth')
+config_dir = '.'
 
 db = None
 signer = None
@@ -165,7 +165,14 @@ def process_input(j):
     return (rpc_id, methods[m](p))
 
 
-def start_server():
+def start_server_lo(spec):
+    s = socket.socket(family=socket.AF_INET, type=socket.SOCK_STREAM)
+    s.bind(spec)
+    logg.debug('created tcp socket {}'.format(spec))
+    start_server(s)
+
+
+def start_server_ipc(socket_path):
     socket_dir = os.path.dirname(socket_path)
     try:
         fi = os.stat(socket_dir)
@@ -180,7 +187,12 @@ def start_server():
         pass
     s = socket.socket(family = socket.AF_UNIX, type = socket.SOCK_STREAM)
     s.bind(socket_path)
+    logg.debug('created unix ipc socket {}'.format(socket_path))
+    start_server(s)
+
+def start_server(s):
     s.listen(10)
+    logg.debug('server started')
     while True:
         (csock, caddr) = s.accept()
         d = csock.recv(4096)
@@ -235,7 +247,13 @@ def main():
         arg = json.loads(sys.argv[1])
     except:
         logg.info('no json rpc command detected, starting socket server')
-        start_server()
+        socket_spec = socket_path.split(':')
+        if len(socket_spec) == 2:
+            host = socket_spec[0]
+            port = int(socket_spec[1])
+            start_server_lo((host, port))
+        else:
+            start_server_ipc(socket_path)
         sys.exit(0)
    
     (rpc_id, response) = process_input(arg)

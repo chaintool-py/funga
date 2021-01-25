@@ -3,6 +3,7 @@
 	- Remove unused insert_key method in keystore interface
 	- Add transaction executor helper, with adapter helper for eth
 	- Fix bitlength of integers in all tx fields before rlp encoding
+	- Add tcp server
 * 0.4.12
 	- Enforce hex strings in signer backend for sign message
 * 0.4.11
