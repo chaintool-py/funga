@@ -81,7 +81,7 @@ class TestHelper(unittest.TestCase):
     def test_eth_helper(self):
         backend = MockEthTxBackend()
         w3 = web3.Web3(web3.Web3.HTTPProvider('http://localhost:8545'))
-        executor = EthTxExecutor(w3, self.address_hex, self.signer, 8996)
+        executor = EthTxExecutor(w3, self.address_hex, self.signer, 1337)
 
         tx_ish = {'from': self.address_hex}
         #executor.sign_and_send([backend.builder, backend.builder_two])

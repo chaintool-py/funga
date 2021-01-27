@@ -165,14 +165,14 @@ def process_input(j):
     return (rpc_id, methods[m](p))
 
 
-def start_server_lo(spec):
+def start_server_tcp(spec):
     s = socket.socket(family=socket.AF_INET, type=socket.SOCK_STREAM)
     s.bind(spec)
     logg.debug('created tcp socket {}'.format(spec))
     start_server(s)
 
 
-def start_server_ipc(socket_path):
+def start_server_unix(socket_path):
     socket_dir = os.path.dirname(socket_path)
     try:
         fi = os.stat(socket_dir)
@@ -189,6 +189,7 @@ def start_server_ipc(socket_path):
     s.bind(socket_path)
     logg.debug('created unix ipc socket {}'.format(socket_path))
     start_server(s)
+
 
 def start_server(s):
     s.listen(10)
@@ -251,9 +252,9 @@ def main():
         if len(socket_spec) == 2:
             host = socket_spec[0]
             port = int(socket_spec[1])
-            start_server_lo((host, port))
+            start_server_tcp((host, port))
         else:
-            start_server_ipc(socket_path)
+            start_server_unix(socket_path)
         sys.exit(0)
    
     (rpc_id, response) = process_input(arg)

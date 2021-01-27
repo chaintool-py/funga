@@ -4,3 +4,7 @@ class UnknownAccountError(Exception):
 
 class TransactionRevertError(Exception):
     pass
+
+
+class NetworkError(Exception):
+    pass

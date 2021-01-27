@@ -3,6 +3,7 @@ import logging
 
 # local imports
 from crypto_dev_signer.helper import TxExecutor
+from crypto_dev_signer.error import NetworkError
 
 logg = logging.getLogger()
 logging.getLogger('web3').setLevel(logging.CRITICAL)
@@ -30,7 +31,14 @@ class EthTxExecutor(TxExecutor):
 
 
     def dispatcher(self, tx):
-        return self.w3.eth.sendRawTransaction(tx)
+        error_object = None
+        try:
+            tx_hash = self.w3.eth.sendRawTransaction(tx)
+        except ValueError as e:
+            error_object = e.args[0]
+            logg.error('node could not intepret rlp {}'.format(tx))
+        if error_object != None:
+            raise NetworkError(error_object)
 
 
     def reporter(self, tx):
