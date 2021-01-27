@@ -39,6 +39,7 @@ class EthTxExecutor(TxExecutor):
             logg.error('node could not intepret rlp {}'.format(tx))
         if error_object != None:
             raise NetworkError(error_object)
+        return tx_hash
 
 
     def reporter(self, tx):
