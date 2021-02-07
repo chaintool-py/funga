@@ -43,7 +43,7 @@ class ReferenceSigner(Signer):
         if tx.r[0] == 0:
             tx.r = tx.r[1:]
         if tx.s[0] == 0:
-            tx.r = tx.s[1:]
+            tx.s = tx.s[1:]
         return z
 
 
