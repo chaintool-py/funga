@@ -40,6 +40,10 @@ class ReferenceSigner(Signer):
         tx.v = v.to_bytes(int(byts), 'big')
         tx.r = z[:32]
         tx.s = z[32:64]
+        if tx.r[0] == 0:
+            tx.r = tx.r[1:]
+        if tx.s[0] == 0:
+            tx.r = tx.s[1:]
         return z
 
 
