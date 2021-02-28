@@ -24,6 +24,7 @@ config_dir = '.'
 
 db = None
 signer = None
+session = None
 chainId = 8995
 socket_path = '/run/crypto-dev-signer/jsonrpc.ipc'
 

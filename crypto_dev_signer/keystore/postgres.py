@@ -43,7 +43,7 @@ class ReferenceKeystore(Keystore):
             self.db_session = sessionmaker(bind=self.db_engine)()
             for s in self.schema:
                 self.db_session.execute(s)
-            self.db_session.commit()
+                self.db_session.commit()
             self.symmetric_key = kwargs.get('symmetric_key')
 
 
@@ -62,7 +62,9 @@ class ReferenceKeystore(Keystore):
             try:
                 k = r.first()[0]
             except TypeError:
+                self.db_session.rollback()
                 raise UnknownAccountError(address)
+            self.db_session.commit()
             return self._decrypt(k, password)
 
 
