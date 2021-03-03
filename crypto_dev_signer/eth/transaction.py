@@ -78,7 +78,7 @@ class EIP155Transaction:
         self.sender = strip_hex_prefix(tx['from'])
 
 
-    def rlp_serialize(self):
+    def __canonical_order(self):
         s = [
             self.nonce,
             self.gas_price,
@@ -90,7 +90,21 @@ class EIP155Transaction:
             self.r,
             self.s,
                 ]
+
+        return s
+
+    def bytes_serialize(self):
+        s = self.__canonical_order()
+        b = b''
+        for e in s:
+            b += e
+        return b
+   
+
+    def rlp_serialize(self):
+        s = self.__canonical_order()
         return rlp_encode(s)
+
 
     def serialize(self):
         tx = {
