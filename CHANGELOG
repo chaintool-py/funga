@@ -1,4 +1,7 @@
-* 0.4.13-unreleased
+* 0.4.14-unreleased
+	- Remove web3 / eth-* module dependencies
+	- Add custom keyfile handling code and cli tool
+* 0.4.13
 	- Implement DictKeystore
 	- Remove unused insert_key method in keystore interface
 	- Add transaction executor helper, with adapter helper for eth
