@@ -48,6 +48,7 @@ setup(
         entry_points = {
             'console_scripts': [
                 'crypto-dev-daemon=crypto_dev_signer.runnable.signer:main',
+                'eth-keyfile=crypto_dev_signer.runnable.keyfile:main',
                 ],
             },
         url='https://gitlab.com/nolash/crypto-dev-signer',
