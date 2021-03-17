@@ -2,7 +2,7 @@
 import logging
 import base64
 
-# third-party imports
+# external imports
 from cryptography.fernet import Fernet
 #import psycopg2
 #from psycopg2 import sql
@@ -10,12 +10,13 @@ from cryptography.fernet import Fernet
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 import sha3
+from hexathon import strip_0x
 
 # local imports
 from .interface import Keystore
-from crypto_dev_signer.common import strip_hex_prefix
-from . import keyapi
+#from . import keyapi
 from crypto_dev_signer.error import UnknownAccountError
+from crypto_dev_signer.encoding import private_key_to_address
 
 logg = logging.getLogger(__file__)
 
@@ -53,7 +54,7 @@ class ReferenceKeystore(Keystore):
 
 
         def get(self, address, password=None):
-            safe_address = strip_hex_prefix(address)
+            safe_address = strip_0x(address)
             s = text('SELECT key_ciphertext FROM ethereum WHERE wallet_address_hex = :a')
             r = self.db_session.execute(s, {
                 'a': safe_address,
@@ -69,10 +70,10 @@ class ReferenceKeystore(Keystore):
 
 
         def import_key(self, pk, password=None):
-            pubk = keyapi.private_key_to_public_key(pk)
-            address_hex = pubk.to_checksum_address()
-            address_hex_clean = strip_hex_prefix(address_hex)
-            c = self._encrypt(pk.to_bytes(), password)
+            address_hex = private_key_to_address(pk)
+            address_hex_clean = strip_0x(address_hex)
+
+            c = self._encrypt(pk.secret, password)
             s = text('INSERT INTO ethereum (wallet_address_hex, key_ciphertext) VALUES (:a, :c)') #%s, %s)')
             self.db_session.execute(s, {
                 'a': address_hex_clean,

@@ -7,7 +7,7 @@ import base64
 import os
 
 # local imports
-from crypto_dev_signer.keystore import DictKeystore
+from crypto_dev_signer.keystore.dict import DictKeystore
 from crypto_dev_signer.error import UnknownAccountError
 from crypto_dev_signer.eth.signer import ReferenceSigner
 

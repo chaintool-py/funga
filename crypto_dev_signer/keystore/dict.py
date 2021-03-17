@@ -1,11 +1,14 @@
 # standard imports
 import logging
 
+# external imports
+from hexathon import strip_0x
+
 # local imports
-from . import keyapi
+#from . import keyapi
 from .interface import Keystore
 from crypto_dev_signer.error import UnknownAccountError
-from crypto_dev_signer.common import strip_hex_prefix
+from crypto_dev_signer.encoding import private_key_to_address
 
 logg = logging.getLogger()
 
@@ -25,9 +28,13 @@ class DictKeystore(Keystore):
             raise UnknownAccountError(address)
 
 
+    def list(self):
+        return list(self.keys.keys())
+
+
     def import_key(self, pk, password=None):
-        pubk = keyapi.private_key_to_public_key(pk)
-        address_hex = pubk.to_checksum_address()
-        address_hex_clean = strip_hex_prefix(address_hex)
-        self.keys[address_hex_clean] = pk.to_bytes()
+        address_hex = private_key_to_address(pk)
+        address_hex_clean = strip_0x(address_hex)
+        self.keys[address_hex_clean] = pk.secret
+        logg.debug('added key {}'.format(address_hex))
         return address_hex

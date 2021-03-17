@@ -1,4 +1,5 @@
 # standard imports
+import re
 import os
 import sys
 import stat
@@ -6,6 +7,7 @@ import socket
 import json
 import logging 
 import argparse
+from urllib.parse import urlparse
 
 # third-party imports
 import confini
@@ -51,9 +53,9 @@ logg.debug('config loaded from {}:\n{}'.format(config_dir, config))
 if args.i:
     chainId = args.i
 if args.s:
-    socket_path = args.s
+    socket_url = urlparse(args.s)
 elif config.get('SIGNER_SOCKET_PATH'):
-    socket_path = config.get('SIGNER_SOCKET_PATH')
+    socket_url = urlparse(config.get('SIGNER_SOCKET_PATH'))
 
 
 # connect to database
@@ -68,6 +70,8 @@ dsn = 'postgresql://{}:{}@{}:{}/{}'.format(
 logg.info('using dsn {}'.format(dsn))
 logg.info('using socket {}'.format(socket_path))
 
+re_http = r'^http'
+re_unix = r'^ipc'
 
 class MissingSecretError(BaseException):
 
@@ -114,7 +118,7 @@ def personal_sign_transaction(p):
 
 # TODO: temporary workaround for platform, since personal_signTransaction is missing from web3.py
 def eth_signTransaction(tx):
-    return personal_sign_transaction([tx, ''])
+    return personal_sign_transaction([tx[0], ''])
 
 
 def eth_sign(p):
@@ -249,13 +253,16 @@ def main():
         arg = json.loads(sys.argv[1])
     except:
         logg.info('no json rpc command detected, starting socket server')
-        socket_spec = socket_path.split(':')
-        if len(socket_spec) == 2:
+        scheme = 'ipc'
+        if socket_url.scheme != '':
+            scheme = socket_url.scheme
+        if re.match(re_http, socket_url.scheme):
+            socket_spec = socket_url.netloc.split(':')
             host = socket_spec[0]
             port = int(socket_spec[1])
             start_server_tcp((host, port))
         else:
-            start_server_unix(socket_path)
+            start_server_unix(socket_url.path)
         sys.exit(0)
    
     (rpc_id, response) = process_input(arg)
