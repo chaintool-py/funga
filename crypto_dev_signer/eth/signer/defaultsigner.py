@@ -84,5 +84,5 @@ class ReferenceSigner(Signer):
 
     def sign(self, address, message, password=None):
         pk = coincurve.PrivateKey(secret=self.keyGetter.get(address, password))
-        z = pk.sign(hasher=None, message=message)
+        z = pk.sign_recoverable(hasher=None, message=message)
         return z

@@ -1,5 +1,5 @@
 psycopg2==2.8.6
-#cryptography==3.2.1
+cryptography==3.2.1
 pysha3==1.0.2
 simple-rlp==0.1.2
 json-rpc==1.13.0
