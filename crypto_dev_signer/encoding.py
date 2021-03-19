@@ -25,7 +25,7 @@ def private_key_to_address(pk, result_format='hex'):
     elif result_format == 'bytes':
         return z[:20]
     raise ValueError('invalid result format "{}"'.format(result_format))
-    
+
 
 def is_address(address_hex):
     try:
