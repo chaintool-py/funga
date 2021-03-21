@@ -41,7 +41,6 @@ def is_checksum_address(address_hex):
         hx = to_checksum(address_hex)
     except ValueError:
         return False
-    print('{} {}'.format(hx, address_hex))
     return hx == address_hex
 
 
