@@ -8,6 +8,7 @@ import getpass
 
 # external impors
 import coincurve
+from hexathon import strip_0x
 
 # local imports
 from crypto_dev_signer.keystore.keyfile import (
@@ -21,6 +22,7 @@ logg = logging.getLogger()
 
 argparser = argparse.ArgumentParser()
 argparser.add_argument('-d', type=str, help='decrypt file')
+argparser.add_argument('-k', type=str, help='load key from file')
 argparser.add_argument('-v', action='store_true', help='be verbose')
 args = argparser.parse_args()
 
@@ -31,7 +33,15 @@ mode = 'create'
 if args.d:
     mode = 'decrypt'
 
+pk_hex = os.environ.get('PRIVATE_KEY')
+if args.k != None:
+    f = open(args.k, 'r')
+    pk_hex = f.read(66)
+    f.close()
+
 def main():
+    global pk_hex
+
     passphrase = os.environ.get('PASSPHRASE')
     r = None
     if mode == 'decrypt':
@@ -45,7 +55,12 @@ def main():
     elif mode == 'create':
         if passphrase == None:
             passphrase = getpass.getpass('encryption phrase: ')
-        pk_bytes = os.urandom(32)
+        pk_bytes = None
+        if pk_hex != None:
+            pk_hex = strip_0x(pk_hex)
+            pk_bytes = bytes.fromhex(pk_hex)
+        else:
+            pk_bytes = os.urandom(32)
         pk = coincurve.PrivateKey(secret=pk_bytes)
         o = to_dict(pk, passphrase)
         r = json.dumps(o)

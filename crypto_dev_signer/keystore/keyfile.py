@@ -13,7 +13,6 @@ import sha3
 # local imports
 from crypto_dev_signer.encoding import private_key_to_address
 
-logging.basicConfig(level=logging.DEBUG)
 logg = logging.getLogger()
 
 algo_keywords = [

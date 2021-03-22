@@ -2,11 +2,12 @@
 import logging
 import binascii
 
-# third-party imports
+# external imports
 from rlp import encode as rlp_encode
-
-# local imports
-from crypto_dev_signer.common import strip_hex_prefix, add_hex_prefix
+from hexathon import (
+        strip_0x,
+        add_0x,
+        )
 
 logg = logging.getLogger(__name__)
 
@@ -23,9 +24,12 @@ class Transaction:
 class EIP155Transaction:
 
     def __init__(self, tx, nonce, chainId=1):
-       
-        to = binascii.unhexlify(strip_hex_prefix(tx['to']))
-        data = binascii.unhexlify(strip_hex_prefix(tx['data']))
+        to = None
+        data = None
+        if tx['to'] != None:
+            to = binascii.unhexlify(strip_0x(tx['to'], allow_empty=True))
+        if tx['data'] != None:
+            data = binascii.unhexlify(strip_0x(tx['data'], allow_empty=True))
 
         gas_price = None
         start_gas = None
@@ -75,7 +79,7 @@ class EIP155Transaction:
         self.v = chainId
         self.r = b''
         self.s = b''
-        self.sender = strip_hex_prefix(tx['from'])
+        self.sender = strip_0x(tx['from'])
 
 
     def __canonical_order(self):
@@ -93,6 +97,7 @@ class EIP155Transaction:
 
         return s
 
+
     def bytes_serialize(self):
         s = self.__canonical_order()
         b = b''
@@ -108,15 +113,15 @@ class EIP155Transaction:
 
     def serialize(self):
         tx = {
-            'nonce': add_hex_prefix(self.nonce.hex()),
-            'gasPrice': add_hex_prefix(self.gas_price.hex()),
-            'gas': add_hex_prefix(self.start_gas.hex()),
-            'to': add_hex_prefix(self.to.hex()),
-            'value': add_hex_prefix(self.value.hex()),
-            'data': add_hex_prefix(self.data.hex()),
-            'v': add_hex_prefix(self.v.hex()),
-            'r': add_hex_prefix(self.r.hex()),
-            's': add_hex_prefix(self.s.hex()),
+            'nonce': add_0x(self.nonce.hex(), allow_empty=True),
+            'gasPrice': add_0x(self.gas_price.hex()),
+            'gas': add_0x(self.start_gas.hex()),
+            'to': add_0x(self.to.hex()),
+            'value': add_0x(self.value.hex(), allow_empty=True),
+            'data': add_0x(self.data.hex()),
+            'v': add_0x(self.v.hex(), allow_empty=True),
+            'r': add_0x(self.r.hex(), allow_empty=True),
+            's': add_0x(self.s.hex(), allow_empty=True),
             }
         if tx['data'] == '':
             tx['data'] = '0x'

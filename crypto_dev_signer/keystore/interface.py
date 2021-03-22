@@ -44,7 +44,7 @@ class Keystore:
         return self.import_raw_key(private_key, password)
 
     def import_keystore_file(self, keystore_file, password=''):
-        private_key = keyfile.from_file(keystore_file)
+        private_key = keyfile.from_file(keystore_file, password)
         #return self.import_keystore_data(keystore_content, password)
-        return self.import_raw_key(private_key, password)
+        return self.import_raw_key(private_key)
         #return kes
