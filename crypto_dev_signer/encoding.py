@@ -12,10 +12,7 @@ from hexathon import (
 logg = logging.getLogger(__name__)
 
 
-def private_key_to_address(pk, result_format='hex'):
-    pubk = coincurve.PublicKey.from_secret(pk.secret)
-    logg.debug('secret {} '.format(pk.secret.hex()))
-    pubk_bytes = pubk.format(compressed=False)
+def public_key_bytes_to_address(pubk_bytes, result_format='hex'):
     h = sha3.keccak_256()
     logg.debug('public key bytes {}'.format(pubk_bytes.hex()))
     h.update(pubk_bytes[1:])
@@ -25,6 +22,17 @@ def private_key_to_address(pk, result_format='hex'):
     elif result_format == 'bytes':
         return z[:20]
     raise ValueError('invalid result format "{}"'.format(result_format))
+
+
+def public_key_to_address(pubk, result_format='hex'):
+    pubk_bytes = pubk.format(compressed=False)
+    return public_key_bytes_to_address(pubk_bytes, result_format='hex')
+
+
+def private_key_to_address(pk, result_format='hex'):
+    pubk = coincurve.PublicKey.from_secret(pk.secret)
+    logg.debug('secret {} '.format(pk.secret.hex()))
+    return public_key_to_address(pubk, result_format)
 
 
 def is_address(address_hex):

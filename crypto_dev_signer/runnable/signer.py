@@ -16,7 +16,7 @@ from jsonrpc.exceptions import *
 # local imports
 from crypto_dev_signer.eth.signer import ReferenceSigner
 from crypto_dev_signer.eth.transaction import EIP155Transaction
-from crypto_dev_signer.keystore import ReferenceKeystore
+from crypto_dev_signer.keystore.reference import ReferenceKeystore
 from crypto_dev_signer.error import UnknownAccountError
 
 logging.basicConfig(level=logging.WARNING)

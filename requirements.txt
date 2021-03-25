@@ -8,4 +8,4 @@ confini~=0.3.6a3
 sqlalchemy==1.3.20
 coincurve==15.0.0
 pycrypto==2.6.1
-hexathon==0.0.1a4
+hexathon~=0.0.1a5
