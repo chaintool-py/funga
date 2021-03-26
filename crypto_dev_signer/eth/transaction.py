@@ -27,9 +27,11 @@ class EIP155Transaction:
         to = None
         data = None
         if tx['to'] != None:
-            to = binascii.unhexlify(strip_0x(tx['to'], allow_empty=True))
+            #to = binascii.unhexlify(strip_0x(tx['to'], allow_empty=True))
+            to = bytes.fromhex(strip_0x(tx['to'], allow_empty=True))
         if tx['data'] != None:
-            data = binascii.unhexlify(strip_0x(tx['data'], allow_empty=True))
+            #data = binascii.unhexlify(strip_0x(tx['data'], allow_empty=True))
+            data = bytes.fromhex(strip_0x(tx['data'], allow_empty=True))
 
         gas_price = None
         start_gas = None

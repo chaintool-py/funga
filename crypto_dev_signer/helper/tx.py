@@ -72,7 +72,7 @@ class TxExecutor:
         logg.debug('from {} nonce {} tx {}'.format(self.sender, self.nonce, tx))
 
         chain_tx = EIP155Transaction(tx, self.nonce, self.chain_id)
-        signature = self.signer.signTransaction(chain_tx)
+        signature = self.signer.sign_transaction(chain_tx)
         chain_tx_serialized = chain_tx.rlp_serialize()
         tx_hash = self.dispatcher('0x' + chain_tx_serialized.hex())
         self.tx_hashes.append(tx_hash)

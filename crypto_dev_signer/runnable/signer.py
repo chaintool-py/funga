@@ -106,7 +106,7 @@ def personal_sign_transaction(p):
     logg.debug('got {} to sign'.format(p[0]))
     #t = EIP155Transaction(p[0], p[0]['nonce'], 8995)
     t = EIP155Transaction(p[0], p[0]['nonce'], int(p[0]['chainId']))
-    z = signer.signTransaction(t, p[1])
+    z = signer.sign_transaction(t, p[1])
     raw_signed_tx = t.rlp_serialize()
     o = {
         'raw': '0x' + raw_signed_tx.hex(),
@@ -116,8 +116,8 @@ def personal_sign_transaction(p):
     return o
 
 
-# TODO: temporary workaround for platform, since personal_signTransaction is missing from web3.py
-def eth_signTransaction(tx):
+# TODO: temporary workaround for platform, since personal_sign_transaction is missing from web3.py
+def eth_sign_transaction(tx):
     return personal_sign_transaction([tx[0], ''])
 
 
@@ -126,14 +126,14 @@ def eth_sign(p):
     message_type = type(p[1]).__name__
     if message_type != 'str':
         raise ValueError('invalid message format, must be {}, not {}'.format(message_type))
-    z = signer.signEthereumMessage(p[0], p[1][2:])
+    z = signer.sign_ethereum_message(p[0], p[1][2:])
     return str(z)
 
 
 methods = {
         'personal_newAccount': personal_new_account,
-        'personal_signTransaction': personal_sign_transaction,
-        'eth_signTransaction': eth_signTransaction,
+        'personal_sign_transaction': personal_sign_transaction,
+        'eth_sign_transaction': eth_sign_transaction,
         'eth_sign': eth_sign,
     }
 

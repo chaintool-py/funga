@@ -48,7 +48,7 @@ class TestDict(unittest.TestCase):
     
     def test_sign_message(self):
         s = ReferenceSigner(self.db)
-        z = s.signEthereumMessage(self.address_hex[2:], b'foo')
+        z = s.sign_ethereum_message(self.address_hex[2:], b'foo')
         logg.debug('zzz {}'.format(str(z)))
 
 

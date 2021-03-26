@@ -68,14 +68,14 @@ class TestSign(unittest.TestCase):
         t = EIP155Transaction(tx_ints, 0)
         self.assertRegex(t.__class__.__name__, "Transaction")
         s = t.serialize()
-        self.assertEqual('{}'.format(s), "{'nonce': '0x00', 'gasPrice': '0x04a817c800', 'gas': '0x5208', 'to': '0x3535353535353535353535353535353535353535', 'value': '0x03e8', 'data': '0xdeadbeef', 'v': '0x01', 'r': '', 's': ''}")
+        self.assertEqual('{}'.format(s), "{'nonce': '0x', 'gasPrice': '0x04a817c800', 'gas': '0x5208', 'to': '0x3535353535353535353535353535353535353535', 'value': '0x03e8', 'data': '0xdeadbeef', 'v': '0x01', 'r': '0x', 's': '0x'}")
         r = t.rlp_serialize()
         self.assertEqual(r.hex(), 'ea808504a817c8008252089435353535353535353535353535353535353535358203e884deadbeef018080')
 
         t = EIP155Transaction(tx_hexs, 0)
         self.assertRegex(t.__class__.__name__, "Transaction")
         s = t.serialize()
-        self.assertEqual('{}'.format(s), "{'nonce': '0x00', 'gasPrice': '0x04a817c800', 'gas': '0x5208', 'to': '0x3535353535353535353535353535353535353535', 'value': '0x03e8', 'data': '0xdeadbeef', 'v': '0x01', 'r': '', 's': ''}")
+        self.assertEqual('{}'.format(s), "{'nonce': '0x', 'gasPrice': '0x04a817c800', 'gas': '0x5208', 'to': '0x3535353535353535353535353535353535353535', 'value': '0x03e8', 'data': '0xdeadbeef', 'v': '0x01', 'r': '0x', 's': '0x'}")
         r = t.rlp_serialize()
         self.assertEqual(r.hex(), 'ea808504a817c8008252089435353535353535353535353535353535353535358203e884deadbeef018080')
 
@@ -84,13 +84,13 @@ class TestSign(unittest.TestCase):
     def test_sign_transaction(self):
         t = EIP155Transaction(tx_ints, 461, 8995)
         s = ReferenceSigner(self.pk_getter)
-        z = s.signTransaction(t)
+        z = s.sign_transaction(t)
 
 
     def test_sign_message(self):
         s = ReferenceSigner(self.pk_getter)
-        z = s.signEthereumMessage(tx_ints['from'], '666f6f')
-        z = s.signEthereumMessage(tx_ints['from'], b'foo')
+        z = s.sign_ethereum_message(tx_ints['from'], '666f6f')
+        z = s.sign_ethereum_message(tx_ints['from'], b'foo')
         logg.debug('zzz {}'.format(str(z)))
 
 

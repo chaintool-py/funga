@@ -12,7 +12,7 @@ from psycopg2 import sql
 from cryptography.fernet import Fernet, InvalidToken
 
 # local imports
-from crypto_dev_signer.keystore.postgres import ReferenceKeystore
+from crypto_dev_signer.keystore.reference import ReferenceKeystore
 from crypto_dev_signer.error import UnknownAccountError
 
 logging.basicConfig(level=logging.DEBUG)

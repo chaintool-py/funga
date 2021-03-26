@@ -41,7 +41,7 @@ class MockEthTxBackend:
     def builder_two(self, tx):
         tx['value'] = 10243
         tx['to'] = to_checksum_address('0x' + os.urandom(20).hex())
-        tx['data'] = ''
+        tx['data'] = '0x'
         if tx.get('feePrice') != None:
             tx['gasPrice'] = tx['feePrice']
             del tx['feePrice']

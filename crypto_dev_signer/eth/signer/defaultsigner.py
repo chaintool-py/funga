@@ -4,12 +4,8 @@ import logging
 # external imports
 import sha3
 import coincurve
-#from eth_keys import KeyAPI
-#from eth_keys.backends import NativeECCBackend
 
-#keys = KeyAPI(NativeECCBackend)
-#logg = logging.getLogger(__name__)
-logg = logging.getLogger()
+logg = logging.getLogger().getChild(__name__)
 
 
 class Signer:
@@ -19,9 +15,8 @@ class Signer:
         self.keyGetter = keyGetter
 
 
-    def signTransaction(self, tx, password=None):
-        raise NotImplementedError
-
+    def sign_transaction(self, tx, password=None):
+        return NotImplementedError
 
 
 class ReferenceSigner(Signer):
@@ -31,7 +26,7 @@ class ReferenceSigner(Signer):
         super(ReferenceSigner, self).__init__(keyGetter)
 
 
-    def signTransaction(self, tx, password=None):
+    def sign_transaction(self, tx, password=None):
         s = tx.rlp_serialize()
         h = sha3.keccak_256()
         h.update(s)
@@ -58,7 +53,7 @@ class ReferenceSigner(Signer):
         return z
 
 
-    def signEthereumMessage(self, address, message, password=None):
+    def sign_ethereum_message(self, address, message, password=None):
         
         #k = keys.PrivateKey(self.keyGetter.get(address, password))
         #z = keys.ecdsa_sign(message_hash=g, private_key=k)
@@ -82,6 +77,7 @@ class ReferenceSigner(Signer):
         return z
 
 
+    # TODO: generic sign should be moved to non-eth context
     def sign(self, address, message, password=None):
         pk = coincurve.PrivateKey(secret=self.keyGetter.get(address, password))
         z = pk.sign_recoverable(hasher=None, message=message)
