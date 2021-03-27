@@ -1,15 +1,20 @@
 # standard imports
 import logging
 import binascii
+import re
 
 # external imports
 from rlp import encode as rlp_encode
 from hexathon import (
         strip_0x,
         add_0x,
+        int_to_minbytes,
         )
 
-logg = logging.getLogger(__name__)
+# local imports
+from crypto_dev_signer.eth.encoding import chain_id_to_v
+
+logg = logging.getLogger().getChild(__name__)
 
 
 class Transaction:
@@ -23,54 +28,55 @@ class Transaction:
 
 class EIP155Transaction:
 
-    def __init__(self, tx, nonce, chainId=1):
-        to = None
-        data = None
-        if tx['to'] != None:
-            #to = binascii.unhexlify(strip_0x(tx['to'], allow_empty=True))
+    def __init__(self, tx, nonce_in, chainId_in=1):
+        to = b''
+        data = b''
+        if tx.get('to') != None:
             to = bytes.fromhex(strip_0x(tx['to'], allow_empty=True))
-        if tx['data'] != None:
-            #data = binascii.unhexlify(strip_0x(tx['data'], allow_empty=True))
+        if tx.get('data') != None:
             data = bytes.fromhex(strip_0x(tx['data'], allow_empty=True))
 
         gas_price = None
         start_gas = None
         value = None
+        nonce = None
+        chainId = None
 
+        # TODO: go directly from hex to bytes
         try:
             gas_price = int(tx['gasPrice'])
+            byts = ((gas_price.bit_length()-1)/8)+1
+            gas_price = gas_price.to_bytes(int(byts), 'big')
         except ValueError:
-            gas_price = int(tx['gasPrice'], 16)
-        byts = ((gas_price.bit_length()-1)/8)+1
-        gas_price = gas_price.to_bytes(int(byts), 'big')
+            gas_price = bytes.fromhex(strip_0x(tx['gasPrice'], allow_empty=True))
 
         try:
             start_gas = int(tx['gas'])
+            byts = ((start_gas.bit_length()-1)/8)+1
+            start_gas = start_gas.to_bytes(int(byts), 'big')
         except ValueError:
-            start_gas = int(tx['gas'], 16)
-        byts = ((start_gas.bit_length()-1)/8)+1
-        start_gas = start_gas.to_bytes(int(byts), 'big')
+            start_gas = bytes.fromhex(strip_0x(tx['gas'], allow_empty=True))
 
         try:
             value = int(tx['value'])
+            byts = ((value.bit_length()-1)/8)+1
+            value = value.to_bytes(int(byts), 'big')
         except ValueError:
-            value = int(tx['value'], 16)
-        byts = ((value.bit_length()-1)/8)+1
-        value = value.to_bytes(int(byts), 'big')
+            value = bytes.fromhex(strip_0x(tx['value'], allow_empty=True))
 
         try:
-            nonce = int(nonce)
+            nonce = int(nonce_in)
+            byts = ((nonce.bit_length()-1)/8)+1
+            nonce = nonce.to_bytes(int(byts), 'big')
         except ValueError:
-            nonce = int(nonce, 16)
-        byts = ((nonce.bit_length()-1)/8)+1
-        nonce = nonce.to_bytes(int(byts), 'big')
+            nonce = bytes.fromhex(strip_0x(nonce_in, allow_empty=True))
 
         try:
-            chainId = int(chainId)
+            chainId = int(chainId_in)
+            byts = ((chainId.bit_length()-1)/8)+1
+            chainId = chainId.to_bytes(int(byts), 'big')
         except ValueError:
-            chainId = int(chainId, 16)
-        byts = ((chainId.bit_length()-1)/8)+1
-        chainId = chainId.to_bytes(int(byts), 'big')
+            chainId = bytes.fromhex(strip_0x(chainId_in, allow_empty=True))
 
         self.nonce = nonce
         self.gas_price = gas_price
@@ -120,7 +126,7 @@ class EIP155Transaction:
             'gas': add_0x(self.start_gas.hex()),
             'to': add_0x(self.to.hex()),
             'value': add_0x(self.value.hex(), allow_empty=True),
-            'data': add_0x(self.data.hex()),
+            'data': add_0x(self.data.hex(), allow_empty=True),
             'v': add_0x(self.v.hex(), allow_empty=True),
             'r': add_0x(self.r.hex(), allow_empty=True),
             's': add_0x(self.s.hex(), allow_empty=True),
@@ -135,3 +141,24 @@ class EIP155Transaction:
             tx['nonce'] = '0x00'
 
         return tx
+
+
+    def apply_signature(self, chain_id, signature):
+        if len(self.r + self.s) > 0:
+            raise AttributeError('signature already set')
+        if len(signature) < 65:
+            raise ValueError('invalid signature length')
+        v = chain_id_to_v(chain_id, signature)
+        self.v = int_to_minbytes(v)
+        self.r = signature[:32]
+        self.s = signature[32:64]
+            
+        for i in range(len(self.r)):
+            if self.r[i] > 0:
+                self.r = self.r[i:]
+                break
+
+        for i in range(len(self.s)):
+            if self.s[i] > 0:
+                self.s = self.s[i:]
+                break

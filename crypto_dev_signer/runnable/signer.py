@@ -102,12 +102,13 @@ def personal_new_account(p):
     return r
 
 
-def personal_sign_transaction(p):
+def personal_signTransaction(p):
     logg.debug('got {} to sign'.format(p[0]))
     #t = EIP155Transaction(p[0], p[0]['nonce'], 8995)
     t = EIP155Transaction(p[0], p[0]['nonce'], int(p[0]['chainId']))
-    z = signer.sign_transaction(t, p[1])
-    raw_signed_tx = t.rlp_serialize()
+ #   z = signer.sign_transaction(t, p[1])
+ #   raw_signed_tx = t.rlp_serialize()
+    raw_signed_tx = signer.sign_transaction_to_rlp(t, p[1])
     o = {
         'raw': '0x' + raw_signed_tx.hex(),
         'tx': t.serialize(),
@@ -116,9 +117,9 @@ def personal_sign_transaction(p):
     return o
 
 
-# TODO: temporary workaround for platform, since personal_sign_transaction is missing from web3.py
-def eth_sign_transaction(tx):
-    return personal_sign_transaction([tx[0], ''])
+# TODO: temporary workaround for platform, since personal_signTransaction is missing from web3.py
+def eth_signTransaction(tx):
+    return personal_signTransaction([tx[0], ''])
 
 
 def eth_sign(p):
@@ -132,8 +133,8 @@ def eth_sign(p):
 
 methods = {
         'personal_newAccount': personal_new_account,
-        'personal_sign_transaction': personal_sign_transaction,
-        'eth_sign_transaction': eth_sign_transaction,
+        'personal_signTransaction': personal_signTransaction,
+        'eth_signTransaction': eth_signTransaction,
         'eth_sign': eth_sign,
     }
 

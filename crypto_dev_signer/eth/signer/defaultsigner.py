@@ -4,6 +4,10 @@ import logging
 # external imports
 import sha3
 import coincurve
+from hexathon import int_to_minbytes
+
+# local imports
+from crypto_dev_signer.eth.encoding import chain_id_to_v
 
 logg = logging.getLogger().getChild(__name__)
 
@@ -31,26 +35,16 @@ class ReferenceSigner(Signer):
         h = sha3.keccak_256()
         h.update(s)
         message_to_sign = h.digest()
-        z = self.sign(tx.sender, message_to_sign, password)
-
-        vnum = int.from_bytes(tx.v, 'big')
-        v = (vnum * 2) + 35 + z[64]
-        byts = ((v.bit_length()-1)/8)+1
-        tx.v = v.to_bytes(int(byts), 'big')
-        tx.r = z[:32]
-        tx.s = z[32:64]
-
-        for i in range(len(tx.r)):
-            if tx.r[i] > 0:
-                tx.r = tx.r[i:]
-                break
-
-        for i in range(len(tx.s)):
-            if tx.s[i] > 0:
-                tx.s = tx.s[i:]
-                break
+        z = self.sign_pure(tx.sender, message_to_sign, password)
 
         return z
+
+
+    def sign_transaction_to_rlp(self, tx, password=None):
+        chain_id = int.from_bytes(tx.v, byteorder='big')
+        sig = self.sign_transaction(tx, password)
+        tx.apply_signature(chain_id, sig)
+        return tx.rlp_serialize()
 
 
     def sign_ethereum_message(self, address, message, password=None):
@@ -73,12 +67,12 @@ class ReferenceSigner(Signer):
         h.update(ethereumed_message_header + message)
         message_to_sign = h.digest()
 
-        z = self.sign(address, message_to_sign, password)
+        z = self.sign_pure(address, message_to_sign, password)
         return z
 
 
     # TODO: generic sign should be moved to non-eth context
-    def sign(self, address, message, password=None):
+    def sign_pure(self, address, message, password=None):
         pk = coincurve.PrivateKey(secret=self.keyGetter.get(address, password))
         z = pk.sign_recoverable(hasher=None, message=message)
         return z
