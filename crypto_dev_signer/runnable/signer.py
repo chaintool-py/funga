@@ -105,7 +105,7 @@ def personal_new_account(p):
 def personal_signTransaction(p):
     logg.debug('got {} to sign'.format(p[0]))
     #t = EIP155Transaction(p[0], p[0]['nonce'], 8995)
-    t = EIP155Transaction(p[0], p[0]['nonce'], int(p[0]['chainId']))
+    t = EIP155Transaction(p[0], p[0]['nonce'], p[0]['chainId'])
  #   z = signer.sign_transaction(t, p[1])
  #   raw_signed_tx = t.rlp_serialize()
     raw_signed_tx = signer.sign_transaction_to_rlp(t, p[1])
@@ -209,7 +209,7 @@ def start_server(s):
             is_valid_json(j)
             logg.debug('{}'.format(d.decode('utf-8')))
         except Exception as e:
-            logg.error('input error {}'.format(e))
+            logg.exception('input error {}'.format(e))
             csock.send(json.dumps(jsonrpc_error(None, JSONRPCParseError)).encode('utf-8'))
             csock.close()
             continue
@@ -221,10 +221,10 @@ def start_server(s):
             csock.send(j)
         except ValueError as e:
             # TODO: handle cases to give better error context to caller
-            logg.error('process error {}'.format(e))
+            logg.exception('process error {}'.format(e))
             csock.send(json.dumps(jsonrpc_error(j['id'], JSONRPCServerError)).encode('utf-8'))
         except UnknownAccountError as e:
-            logg.error('process unknown account error {}'.format(e))
+            logg.exception('process unknown account error {}'.format(e))
             csock.send(json.dumps(jsonrpc_error(j['id'], JSONRPCServerError)).encode('utf-8'))
 
         csock.close()
