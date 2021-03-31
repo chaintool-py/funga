@@ -37,4 +37,4 @@ class DictKeystore(Keystore):
         address_hex_clean = strip_0x(address_hex)
         self.keys[address_hex_clean] = pk.secret
         logg.debug('added key {}'.format(address_hex))
-        return address_hex
+        return address_hex_clean

@@ -6,7 +6,7 @@ import logging
 import base64
 import os
 
-# third-party imports
+# external imports
 import psycopg2
 from psycopg2 import sql
 from cryptography.fernet import Fernet, InvalidToken
@@ -39,6 +39,7 @@ class TestDatabase(unittest.TestCase):
                 }
         self.db = ReferenceKeystore('postgres+psycopg2://postgres@localhost:5432/signer_test', **kw)
         self.address_hex = self.db.new('foo')
+        #self.address_hex = add_0x(address_hex)
 
 
     def tearDown(self):

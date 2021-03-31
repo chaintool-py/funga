@@ -6,6 +6,12 @@ import logging
 import base64
 import os
 
+# external imports
+from hexathon import (
+    strip_0x,
+    add_0x,
+    )
+
 # local imports
 from crypto_dev_signer.keystore.dict import DictKeystore
 from crypto_dev_signer.error import UnknownAccountError
@@ -28,7 +34,8 @@ class TestDict(unittest.TestCase):
 
         keystore_filepath = os.path.join(script_dir, 'testdata', 'UTC--2021-01-08T18-37-01.187235289Z--00a329c0648769a73afac7f9381e08fb43dbea72')
 
-        self.address_hex = self.db.import_keystore_file(keystore_filepath, '')
+        address_hex = self.db.import_keystore_file(keystore_filepath, '')
+        self.address_hex = add_0x(address_hex)
 
 
     def tearDown(self): 
@@ -36,8 +43,8 @@ class TestDict(unittest.TestCase):
 
 
     def test_get_key(self):
-        logg.debug('getting {}'.format(self.address_hex[2:]))
-        pk = self.db.get(self.address_hex[2:], '')
+        logg.debug('getting {}'.format(strip_0x(self.address_hex)))
+        pk = self.db.get(strip_0x(self.address_hex), '')
 
         self.assertEqual(self.address_hex.lower(), '0x00a329c0648769a73afac7f9381e08fb43dbea72')
 
@@ -48,7 +55,7 @@ class TestDict(unittest.TestCase):
     
     def test_sign_message(self):
         s = ReferenceSigner(self.db)
-        z = s.sign_ethereum_message(self.address_hex[2:], b'foo')
+        z = s.sign_ethereum_message(strip_0x(self.address_hex), b'foo')
         logg.debug('zzz {}'.format(str(z)))
 
 

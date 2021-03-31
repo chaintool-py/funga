@@ -9,9 +9,10 @@ import logging
 import argparse
 from urllib.parse import urlparse
 
-# third-party imports
+# external imports
 import confini
 from jsonrpc.exceptions import *
+from hexathon import add_0x
 
 # local imports
 from crypto_dev_signer.eth.signer import ReferenceSigner
@@ -99,9 +100,10 @@ def personal_new_account(p):
 
     r = db.new(password)
              
-    return r
+    return add_0x(r)
 
 
+# TODO: move to translation module ("personal" rpc namespace is node-specific)
 def personal_signTransaction(p):
     logg.debug('got {} to sign'.format(p[0]))
     #t = EIP155Transaction(p[0], p[0]['nonce'], 8995)
@@ -117,9 +119,9 @@ def personal_signTransaction(p):
     return o
 
 
-# TODO: temporary workaround for platform, since personal_signTransaction is missing from web3.py
 def eth_signTransaction(tx):
-    return personal_signTransaction([tx[0], ''])
+    o = personal_signTransaction([tx[0], ''])
+    return o['raw']
 
 
 def eth_sign(p):
