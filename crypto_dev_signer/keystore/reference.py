@@ -10,7 +10,10 @@ from cryptography.fernet import Fernet
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 import sha3
-from hexathon import strip_0x
+from hexathon import (
+        strip_0x,
+        add_0x,
+        )
 
 # local imports
 from .interface import Keystore
@@ -54,7 +57,7 @@ class ReferenceKeystore(Keystore):
 
 
         def get(self, address, password=None):
-            safe_address = strip_0x(address)
+            safe_address = strip_0x(address).lower()
             s = text('SELECT key_ciphertext FROM ethereum WHERE wallet_address_hex = :a')
             r = self.db_session.execute(s, {
                 'a': safe_address,
@@ -64,14 +67,15 @@ class ReferenceKeystore(Keystore):
                 k = r.first()[0]
             except TypeError:
                 self.db_session.rollback()
-                raise UnknownAccountError(address)
+                raise UnknownAccountError(safe_address)
             self.db_session.commit()
-            return self._decrypt(k, password)
+            a = self._decrypt(k, password)
+            return a
 
 
         def import_key(self, pk, password=None):
             address_hex = private_key_to_address(pk)
-            address_hex_clean = strip_0x(address_hex)
+            address_hex_clean = strip_0x(address_hex).lower()
 
             c = self._encrypt(pk.secret, password)
             s = text('INSERT INTO ethereum (wallet_address_hex, key_ciphertext) VALUES (:a, :c)') #%s, %s)')
@@ -82,7 +86,7 @@ class ReferenceKeystore(Keystore):
                 )
             self.db_session.commit()
             logg.info('added private key for address {}'.format(address_hex_clean))
-            return address_hex
+            return add_0x(address_hex)
 
 
         def _encrypt(self, private_key, password):

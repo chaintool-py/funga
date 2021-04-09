@@ -6,6 +6,7 @@ import json
 import uuid
 
 # external imports
+import coincurve
 from Crypto.Cipher import AES
 from Crypto.Util import Counter
 import sha3
@@ -72,7 +73,9 @@ class Ciphers:
         return ciphertext
 
 
-def to_dict(private_key, passphrase=''):
+def to_dict(private_key_bytes, passphrase=''):
+   
+    private_key = coincurve.PrivateKey(secret=private_key_bytes)
 
     encryption_key = Hashes.from_scrypt(passphrase=passphrase)
 
