@@ -4,7 +4,7 @@ import binascii
 import re
 
 # external imports
-from rlp import encode as rlp_encode
+#from rlp import encode as rlp_encode
 from hexathon import (
         strip_0x,
         add_0x,
@@ -13,6 +13,7 @@ from hexathon import (
 
 # local imports
 from crypto_dev_signer.eth.encoding import chain_id_to_v
+from crypto_dev_signer.eth.rlp import rlp_encode
 
 logg = logging.getLogger().getChild(__name__)
 

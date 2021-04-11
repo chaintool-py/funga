@@ -13,6 +13,15 @@ while True:
     requirements.append(l.rstrip())
 f.close()
 
+sql_requirements = []
+f = open('sql_requirements.txt', 'r')
+while True:
+    l = f.readline()
+    if l == '':
+        break
+    sql_requirements.append(l.rstrip())
+f.close()
+
 test_requirements = []
 f = open('test_requirements.txt', 'r')
 while True:
@@ -24,7 +33,7 @@ f.close()
 
 setup(
         name="crypto-dev-signer",
-        version="0.4.14a17",
+        version="0.4.14b1",
         description="A signer and keystore daemon and library for cryptocurrency software development",
         author="Louis Holbrook",
         author_email="dev@holbrook.no",
@@ -39,6 +48,9 @@ setup(
             'crypto_dev_signer',
             ],
         install_requires=requirements,
+        extras_require={
+            'sql': sql_requirements,
+            },
         tests_require=test_requirements,
         long_description=long_description,
         long_description_content_type='text/markdown',
