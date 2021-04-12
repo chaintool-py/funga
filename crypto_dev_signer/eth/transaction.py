@@ -13,10 +13,12 @@ from hexathon import (
 
 # local imports
 from crypto_dev_signer.eth.encoding import chain_id_to_v
-from crypto_dev_signer.eth.rlp import rlp_encode
+#from crypto_dev_signer.eth.rlp import rlp_encode
+import rlp
 
 logg = logging.getLogger().getChild(__name__)
 
+rlp_encode = rlp.encode
 
 class Transaction:
     
@@ -91,7 +93,7 @@ class EIP155Transaction:
         self.sender = strip_0x(tx['from'])
 
 
-    def __canonical_order(self):
+    def canonical_order(self):
         s = [
             self.nonce,
             self.gas_price,
@@ -108,7 +110,7 @@ class EIP155Transaction:
 
 
     def bytes_serialize(self):
-        s = self.__canonical_order()
+        s = self.canonical_order()
         b = b''
         for e in s:
             b += e
@@ -116,7 +118,7 @@ class EIP155Transaction:
    
 
     def rlp_serialize(self):
-        s = self.__canonical_order()
+        s = self.canonical_order()
         return rlp_encode(s)
 
 
