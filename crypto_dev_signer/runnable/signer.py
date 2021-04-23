@@ -143,7 +143,7 @@ methods = {
 
 def jsonrpc_error(rpc_id, err):
     return {
-            'json-rpc': '2.0',
+            'jsonrpc': '2.0',
             'id': rpc_id,
             'error': {
                 'code': err.CODE,
@@ -154,7 +154,7 @@ def jsonrpc_error(rpc_id, err):
 
 def jsonrpc_ok(rpc_id, response):
     return {
-            'json-rpc': '2.0',
+            'jsonrpc': '2.0',
             'id': rpc_id,
             'result': response,
             }
