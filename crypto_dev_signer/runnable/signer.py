@@ -69,7 +69,7 @@ dsn = 'postgresql://{}:{}@{}:{}/{}'.format(
     )
 
 logg.info('using dsn {}'.format(dsn))
-logg.info('using socket {}'.format(socket_path))
+logg.info('using socket {}'.format(config.get('SIGNER_SOCKET_PATH')))
 
 re_http = r'^http'
 re_unix = r'^ipc'

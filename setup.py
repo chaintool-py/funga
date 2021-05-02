@@ -63,5 +63,5 @@ setup(
                 'eth-keyfile=crypto_dev_signer.runnable.keyfile:main',
                 ],
             },
-        url='https://gitlab.com/nolash/crypto-dev-signer',
+        url='https://gitlab.com/chaintools/crypto-dev-signer',
         )
