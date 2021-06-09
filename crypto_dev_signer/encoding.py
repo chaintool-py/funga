@@ -31,7 +31,7 @@ def public_key_to_address(pubk, result_format='hex'):
 
 def private_key_to_address(pk, result_format='hex'):
     pubk = coincurve.PublicKey.from_secret(pk.secret)
-    logg.debug('secret {} '.format(pk.secret.hex()))
+    #logg.debug('secret {} '.format(pk.secret.hex()))
     return public_key_to_address(pubk, result_format)
 
 
