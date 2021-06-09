@@ -22,6 +22,7 @@ logg = logging.getLogger()
 
 argparser = argparse.ArgumentParser()
 argparser.add_argument('-d', type=str, help='decrypt file')
+argparser.add_argument('-z', action='store_true', help='zero-length password')
 argparser.add_argument('-k', type=str, help='load key from file')
 argparser.add_argument('-v', action='store_true', help='be verbose')
 args = argparser.parse_args()
@@ -43,6 +44,8 @@ def main():
     global pk_hex
 
     passphrase = os.environ.get('PASSPHRASE')
+    if args.z:
+        passphrase = ''
     r = None
     if mode == 'decrypt':
         if passphrase == None:

@@ -33,7 +33,7 @@ f.close()
 
 setup(
         name="crypto-dev-signer",
-        version="0.4.14b3",
+        version="0.4.14b4",
         description="A signer and keystore daemon and library for cryptocurrency software development",
         author="Louis Holbrook",
         author_email="dev@holbrook.no",
@@ -63,5 +63,5 @@ setup(
                 'eth-keyfile=crypto_dev_signer.runnable.keyfile:main',
                 ],
             },
-        url='https://gitlab.com/chaintools/crypto-dev-signer',
+        url='https://gitlab.com/chaintool/crypto-dev-signer',
         )
