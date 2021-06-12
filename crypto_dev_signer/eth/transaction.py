@@ -146,12 +146,15 @@ class EIP155Transaction:
         return tx
 
 
-    def apply_signature(self, chain_id, signature):
+    def apply_signature(self, chain_id, signature, literal_v=False):
         if len(self.r + self.s) > 0:
             raise AttributeError('signature already set')
         if len(signature) < 65:
             raise ValueError('invalid signature length')
-        v = chain_id_to_v(chain_id, signature)
+        if literal_v:
+            v = signature[64]
+        else:
+            v = chain_id_to_v(chain_id, signature)
         self.v = int_to_minbytes(v)
         self.r = signature[:32]
         self.s = signature[32:64]
