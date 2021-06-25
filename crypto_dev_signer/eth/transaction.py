@@ -152,7 +152,7 @@ class EIP155Transaction:
         if len(signature) < 65:
             raise ValueError('invalid signature length')
         if v == None:
-            v = signature[64]
+            v = chain_id_to_v(chain_id, signature)
         self.v = int_to_minbytes(v)
         self.r = signature[:32]
         self.s = signature[32:64]
