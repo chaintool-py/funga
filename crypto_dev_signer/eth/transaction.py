@@ -127,13 +127,17 @@ class EIP155Transaction:
             'nonce': add_0x(self.nonce.hex(), allow_empty=True),
             'gasPrice': add_0x(self.gas_price.hex()),
             'gas': add_0x(self.start_gas.hex()),
-            'to': add_0x(self.to.hex()),
             'value': add_0x(self.value.hex(), allow_empty=True),
             'data': add_0x(self.data.hex(), allow_empty=True),
             'v': add_0x(self.v.hex(), allow_empty=True),
             'r': add_0x(self.r.hex(), allow_empty=True),
             's': add_0x(self.s.hex(), allow_empty=True),
             }
+        if self.to == None or len(self.to) == 0:
+            tx['to'] = None
+        else:
+            tx['to'] = add_0x(self.to.hex())
+
         if tx['data'] == '':
             tx['data'] = '0x'
 
