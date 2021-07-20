@@ -12,6 +12,10 @@ from hexathon import (
 logg = logging.getLogger(__name__)
 
 
+def private_key_from_bytes(b):
+    return coincurve.PrivateKey(secret=b)
+
+
 def public_key_bytes_to_address(pubk_bytes, result_format='hex'):
     h = sha3.keccak_256()
     logg.debug('public key bytes {}'.format(pubk_bytes.hex()))

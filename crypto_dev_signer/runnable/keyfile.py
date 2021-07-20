@@ -15,13 +15,18 @@ from crypto_dev_signer.keystore.keyfile import (
         from_file,
         to_dict,
         )
+from crypto_dev_signer.encoding import (
+        private_key_to_address,
+        private_key_from_bytes,
+        )
 
 
 logging.basicConfig(level=logging.WARNING)
 logg = logging.getLogger()
 
 argparser = argparse.ArgumentParser()
-argparser.add_argument('-d', type=str, help='decrypt file')
+argparser.add_argument('-d', '--decrypt', dest='d', type=str, help='decrypt file')
+argparser.add_argument('--private-key', dest='private_key', action='store_true', help='output private key instead of address')
 argparser.add_argument('-z', action='store_true', help='zero-length password')
 argparser.add_argument('-k', type=str, help='load key from file')
 argparser.add_argument('-v', action='store_true', help='be verbose')
@@ -31,8 +36,11 @@ if args.v:
     logg.setLevel(logging.DEBUG)
 
 mode = 'create'
+secret = False
 if args.d:
     mode = 'decrypt'
+    if args.private_key:
+        secret = True
 
 pk_hex = os.environ.get('PRIVATE_KEY')
 if args.k != None:
@@ -55,6 +63,9 @@ def main():
         except AssertionError:
             sys.stderr.write('Invalid passphrase\n')
             sys.exit(1)
+        if not secret:
+            pk = private_key_from_bytes(bytes.fromhex(r))
+            r = private_key_to_address(pk)
     elif mode == 'create':
         if passphrase == None:
             passphrase = getpass.getpass('encryption phrase: ')

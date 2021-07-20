@@ -5,7 +5,7 @@ import logging
 
 # local imports
 from crypto_dev_signer.keystore import keyfile
-import coincurve
+from crypto_dev_signer.encoding import private_key_from_bytes
 
 logg = logging.getLogger(__name__)
 
@@ -25,7 +25,7 @@ class Keystore:
 
 
     def import_raw_key(self, b, password=None):
-        pk = coincurve.PrivateKey(secret=b)
+        pk = private_key_from_bytes(b)
         return self.import_key(pk, password)
 
 

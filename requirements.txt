@@ -2,6 +2,7 @@ cryptography==3.2.1
 pysha3==1.0.2
 rlp==2.0.1
 json-rpc==1.13.0
-confini~=0.3.6rc3
+confini>=0.3.6rc3,<0.5.0
 coincurve==15.0.0
 hexathon~=0.0.1a7
+pycryptodome==3.10.1
