@@ -14,7 +14,7 @@ import sha3
 # local imports
 from crypto_dev_signer.encoding import private_key_to_address
 
-logg = logging.getLogger()
+logg = logging.getLogger(__name__)
 
 algo_keywords = [
     'aes-128-ctr',

@@ -16,7 +16,7 @@ from crypto_dev_signer.eth.encoding import chain_id_to_v
 #from crypto_dev_signer.eth.rlp import rlp_encode
 import rlp
 
-logg = logging.getLogger().getChild(__name__)
+logg = logging.getLogger(__name__)
 
 rlp_encode = rlp.encode
 

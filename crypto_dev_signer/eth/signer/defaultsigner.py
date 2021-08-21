@@ -9,7 +9,7 @@ from hexathon import int_to_minbytes
 # local imports
 from crypto_dev_signer.eth.encoding import chain_id_to_v
 
-logg = logging.getLogger().getChild(__name__)
+logg = logging.getLogger(__name__)
 
 
 class Signer:

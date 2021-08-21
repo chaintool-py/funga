@@ -34,7 +34,6 @@ class Keystore:
 
 
     def import_keystore_data(self, keystore_content, password=''):
-        #private_key = w3.eth.account.decrypt(keystore_content, password)
         if type(keystore_content).__name__ == 'str':
             keystore_content = json.loads(keystore_content)
         elif type(keystore_content).__name__ == 'bytes':
@@ -45,6 +44,4 @@ class Keystore:
 
     def import_keystore_file(self, keystore_file, password=''):
         private_key = keyfile.from_file(keystore_file, password)
-        #return self.import_keystore_data(keystore_content, password)
         return self.import_raw_key(private_key)
-        #return kes
