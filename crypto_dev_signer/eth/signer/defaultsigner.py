@@ -40,15 +40,18 @@ class ReferenceSigner(Signer):
         return z
 
 
-    def sign_transaction_to_rlp(self, tx, password=None):
+    def sign_transaction_to_wire(self, tx, password=None):
         chain_id = int.from_bytes(tx.v, byteorder='big')
         sig = self.sign_transaction(tx, password)
         tx.apply_signature(chain_id, sig)
         return tx.rlp_serialize()
 
 
-    def sign_ethereum_message(self, address, message, password=None):
-        
+    def sign_transaction_to_rlp(self, tx, password=None):
+        return self.sign_transaction_to_wire(tx, password=password)
+
+
+    def sign_message(self, address, message, password=None):
         #k = keys.PrivateKey(self.keyGetter.get(address, password))
         #z = keys.ecdsa_sign(message_hash=g, private_key=k)
         if type(message).__name__ == 'str':
@@ -69,6 +72,10 @@ class ReferenceSigner(Signer):
 
         z = self.sign_pure(address, message_to_sign, password)
         return z
+
+
+    def sign_ethereum_message(self, address, message, password=None):
+        return self.sign_message(address, message, password=None)
 
 
     # TODO: generic sign should be moved to non-eth context
