@@ -8,6 +8,11 @@ import json
 import logging 
 import argparse
 from urllib.parse import urlparse
+from http.server import (
+        HTTPServer,
+        BaseHTTPRequestHandler,
+    )
+
 
 # external imports
 import confini
@@ -72,6 +77,7 @@ logg.info('using dsn {}'.format(dsn))
 logg.info('using socket {}'.format(config.get('SIGNER_SOCKET_PATH')))
 
 re_http = r'^http'
+re_tcp = r'^tcp'
 re_unix = r'^ipc'
 
 class MissingSecretError(BaseException):
@@ -177,7 +183,7 @@ def start_server_tcp(spec):
     s = socket.socket(family=socket.AF_INET, type=socket.SOCK_STREAM)
     s.bind(spec)
     logg.debug('created tcp socket {}'.format(spec))
-    start_server(s)
+    start_server_socket(s)
 
 
 def start_server_unix(socket_path):
@@ -196,15 +202,30 @@ def start_server_unix(socket_path):
     s = socket.socket(family = socket.AF_UNIX, type = socket.SOCK_STREAM)
     s.bind(socket_path)
     logg.debug('created unix ipc socket {}'.format(socket_path))
-    start_server(s)
+    start_server_socket(s)
 
 
-def start_server(s):
-    s.listen(10)
-    logg.debug('server started')
-    while True:
-        (csock, caddr) = s.accept()
-        d = csock.recv(4096)
+def start_server_http(spec):
+    httpd = HTTPServer(spec, HTTPSignRequestHandler)
+    logg.debug('starting http server {}'.format(spec))
+    httpd.serve_forever()
+
+
+class SignerError(Exception):
+
+
+    def __init__(self, s):
+        super(SignerError, self).__init__(s)
+        self.jsonrpc_error = s
+
+
+    def to_jsonrpc(self):
+        return self.jsonrpc_error
+
+
+class SignRequestHandler:
+
+    def handle_jsonrpc(self, d):
         j = None
         try:
             j = json.loads(d)
@@ -212,23 +233,105 @@ def start_server(s):
             logg.debug('{}'.format(d.decode('utf-8')))
         except Exception as e:
             logg.exception('input error {}'.format(e))
-            csock.send(json.dumps(jsonrpc_error(None, JSONRPCParseError)).encode('utf-8'))
-            csock.close()
-            continue
+            j = json.dumps(jsonrpc_error(None, JSONRPCParseError)).encode('utf-8')
+            raise SignerError(j)
 
         try:
             (rpc_id, r) = process_input(j)
             r = jsonrpc_ok(rpc_id, r)
             j = json.dumps(r).encode('utf-8')
-            csock.send(j)
         except ValueError as e:
             # TODO: handle cases to give better error context to caller
             logg.exception('process error {}'.format(e))
-            csock.send(json.dumps(jsonrpc_error(j['id'], JSONRPCServerError)).encode('utf-8'))
+            j = json.dumps(jsonrpc_error(j['id'], JSONRPCServerError)).encode('utf-8')
+            raise SignerError(j)
         except UnknownAccountError as e:
             logg.exception('process unknown account error {}'.format(e))
-            csock.send(json.dumps(jsonrpc_error(j['id'], JSONRPCServerError)).encode('utf-8'))
+            j = json.dumps(jsonrpc_error(j['id'], JSONRPCServerError)).encode('utf-8')
+            raise SignerError(j)
 
+        return j
+
+
+class HTTPSignRequestHandler(BaseHTTPRequestHandler, SignRequestHandler):
+
+    def do_POST(self):
+        if self.headers.get('Content-Type') != 'application/json':
+            self.send_response(400, 'me read json only')
+            self.end_headers()
+            return
+
+        try:
+            if 'application/json' not in self.headers.get('Accept').split(','):
+                self.send_response(400, 'me json only speak')
+                self.end_headers()
+                return
+        except AttributeError:
+            pass
+
+        l = self.headers.get('Content-Length')
+        try:
+            l = int(l)
+        except ValueError:
+            self.send_response(400, 'content length must be integer')
+            self.end_headers()
+            return
+        if l > 4096:
+            self.send_response(400, 'too much information')
+            self.end_headers()
+            return
+        if l < 0:
+            self.send_response(400, 'you are too negative')
+            self.end_headers()
+            return
+
+        b = b''
+        c = 0
+        while c < l:
+            d = self.rfile.read(l-c)
+            if d == None:
+                break
+            b += d
+            c += len(d)
+            if c > 4096:
+                self.send_response(413, 'i should slap you around for lying about your size')
+                self.end_headers()
+                return
+
+        try:
+            r = self.handle_jsonrpc(d)
+        except SignerError as e:
+            r = e.to_jsonrpc()
+
+        #b = json.dumps(r).encode('utf-8')
+        l = len(r)
+        self.send_response(200, 'You are the Keymaster')
+        self.send_header('Content-Length', str(l))
+        self.send_header('Cache-Control', 'no-cache')
+        self.send_header('Content-Type', 'application/json')
+        self.end_headers()
+
+        c = 0
+        while c < l:
+            n = self.wfile.write(r[c:])
+            c += n
+
+
+def start_server_socket(s):
+    s.listen(10)
+    logg.debug('server started')
+    handler = SignRequestHandler()
+    while True:
+        (csock, caddr) = s.accept()
+        d = csock.recv(4096)
+       
+        r = None
+        try:
+            r = handler.handle_jsonrpc(d)
+        except SignerError as e:
+            r = e.to_jsonrpc()
+
+        csock.send(r)
         csock.close()
     s.close()
 
@@ -255,15 +358,20 @@ def main():
     try:
         arg = json.loads(sys.argv[1])
     except:
-        logg.info('no json rpc command detected, starting socket server')
+        logg.info('no json rpc command detected, starting socket server {}'.format(socket_url))
         scheme = 'ipc'
         if socket_url.scheme != '':
             scheme = socket_url.scheme
-        if re.match(re_http, socket_url.scheme):
+        if re.match(re_tcp, socket_url.scheme):
             socket_spec = socket_url.netloc.split(':')
             host = socket_spec[0]
             port = int(socket_spec[1])
             start_server_tcp((host, port))
+        elif re.match(re_http, socket_url.scheme):
+            socket_spec = socket_url.netloc.split(':')
+            host = socket_spec[0]
+            port = int(socket_spec[1])
+            start_server_http((host, port))
         else:
             start_server_unix(socket_url.path)
         sys.exit(0)
