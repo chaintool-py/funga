@@ -23,13 +23,6 @@ from .jsonrpc import (
 
 logg = logging.getLogger(__name__)
 
-#methods = {
-#        'personal_newAccount': personal_new_account,
-#        'personal_signTransaction': personal_signTransaction,
-#        'eth_signTransaction': eth_signTransaction,
-#        'eth_sign': eth_sign,
-#    }
-
 
 class SignRequestHandler:
 
@@ -40,7 +33,7 @@ class SignRequestHandler:
         rpc_id = j['id']
         m = j['method']
         p = j['params']
-        return (rpc_id, getattr(self, m)(p)) #methods[m](p))
+        return (rpc_id, getattr(self, m)(p))
 
 
     def handle_jsonrpc(self, d):
