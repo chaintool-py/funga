@@ -1,12 +1,10 @@
-# standard imports
+#!/usr/bin/python
+
 import unittest
 import logging
-import copy
 
-# external imports
 from rlp import encode as rlp_encode
 
-# local imports
 from crypto_dev_signer.eth.signer import ReferenceSigner
 from crypto_dev_signer.eth.transaction import EIP155Transaction
 
@@ -25,21 +23,14 @@ tx_ints = {
 }
 
 tx_hexs = {
-    'nonce': '0x',
+    'nonce': '0x0',
     'from': "0xEB014f8c8B418Db6b45774c326A0E64C78914dC0",
-    'gasPrice': "0x04a817c800",
+    'gasPrice': "0x4a817c800",
     'gas': "0x5208",
     'to': '0x3535353535353535353535353535353535353535',
-    'value': "0x03e8",
-    'data': "0xdeadbeef",
+    'value': "0x3e8",
+    'data': "deadbeef",
 }
-
-tx_hexs_r = copy.copy(tx_hexs)
-tx_hexs_r['r'] = '0x'
-tx_hexs_r['s'] = '0x'
-tx_hexs_r['v'] = '0x01'
-del tx_hexs_r['from']
-
 
 class pkGetter:
 
@@ -77,14 +68,14 @@ class TestSign(unittest.TestCase):
         t = EIP155Transaction(tx_ints, 0)
         self.assertRegex(t.__class__.__name__, "Transaction")
         s = t.serialize()
-        self.assertDictEqual(s, tx_hexs_r)
+        self.assertEqual('{}'.format(s), "{'nonce': '0x', 'gasPrice': '0x04a817c800', 'gas': '0x5208', 'to': '0x3535353535353535353535353535353535353535', 'value': '0x03e8', 'data': '0xdeadbeef', 'v': '0x01', 'r': '0x', 's': '0x'}")
         r = t.rlp_serialize()
         self.assertEqual(r.hex(), 'ea808504a817c8008252089435353535353535353535353535353535353535358203e884deadbeef018080')
 
         t = EIP155Transaction(tx_hexs, 0)
         self.assertRegex(t.__class__.__name__, "Transaction")
         s = t.serialize()
-        self.assertDictEqual(s, tx_hexs_r)
+        self.assertEqual('{}'.format(s), "{'nonce': '0x', 'gasPrice': '0x04a817c800', 'gas': '0x5208', 'to': '0x3535353535353535353535353535353535353535', 'value': '0x03e8', 'data': '0xdeadbeef', 'v': '0x01', 'r': '0x', 's': '0x'}")
         r = t.rlp_serialize()
         self.assertEqual(r.hex(), 'ea808504a817c8008252089435353535353535353535353535353535353535358203e884deadbeef018080')
 
@@ -100,6 +91,7 @@ class TestSign(unittest.TestCase):
         s = ReferenceSigner(self.pk_getter)
         z = s.sign_ethereum_message(tx_ints['from'], '666f6f')
         z = s.sign_ethereum_message(tx_ints['from'], b'foo')
+        logg.debug('zzz {}'.format(str(z)))
 
 
 if __name__ == '__main__':
