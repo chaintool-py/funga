@@ -1,0 +1,6 @@
+Missing tests for:
+
+- crypto_dev_signer/cli/http.py
+- crypto_dev_signer/cli/socket.py
+
+tests/test_keystore_reference.py is dependent on postgres, should use sqlite for tests so that it can run independently

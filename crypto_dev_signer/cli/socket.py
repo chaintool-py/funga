@@ -11,24 +11,33 @@ from .handle import SignRequestHandler
 logg = logging.getLogger(__name__)
 
 
-def start_server_socket(s):
-    s.listen(10)
-    logg.debug('server started')
-    handler = SignRequestHandler()
-    while True:
-        (csock, caddr) = s.accept()
+class SocketHandler:
+
+    def __init__(self):
+        self.handler = SignRequestHandler()
+
+
+    def process(self, csock):
         d = csock.recv(4096)
        
         r = None
         try:
-            r = handler.handle_jsonrpc(d)
+            r = self.handler.handle_jsonrpc(d)
         except SignerError as e:
             r = e.to_jsonrpc()
 
         csock.send(r)
+
+
+def start_server_socket(s):
+    s.listen(10)
+    logg.debug('server started')
+    handler = SocketHandler()
+    while True:
+        (csock, caddr) = s.accept()
+        handler.process(csock)
         csock.close()
     s.close()
-
     os.unlink(socket_path)
 
 

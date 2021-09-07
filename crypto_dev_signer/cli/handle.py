@@ -8,6 +8,7 @@ from jsonrpc.exceptions import (
         JSONRPCParseError,
         JSONRPCInvalidParams,
         )
+from hexathon import add_0x
 
 # local imports
 from crypto_dev_signer.eth.transaction import EIP155Transaction
@@ -96,12 +97,11 @@ class SignRequestHandler:
             'raw': '0x' + raw_signed_tx.hex(),
             'tx': t.serialize(),
             }
-        logg.debug('signed {}'.format(o))
         return o
 
 
     def eth_signTransaction(self, tx):
-        o = personal_signTransaction([tx[0], ''])
+        o = self.personal_signTransaction([tx[0], ''])
         return o['raw']
 
 
@@ -111,5 +111,5 @@ class SignRequestHandler:
         if message_type != 'str':
             raise ValueError('invalid message format, must be {}, not {}'.format(message_type))
         z = self.signer.sign_ethereum_message(p[0], p[1][2:])
-        return str(z)
+        return add_0x(z.hex())
 

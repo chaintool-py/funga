@@ -10,10 +10,8 @@ from urllib.parse import urlparse
 # external imports
 import confini
 from jsonrpc.exceptions import *
-from hexathon import add_0x
 
 # local imports
-from crypto_dev_signer.cli.cmd import *
 from crypto_dev_signer.eth.signer import ReferenceSigner
 from crypto_dev_signer.keystore.reference import ReferenceKeystore
 from crypto_dev_signer.cli.handle import SignRequestHandler
