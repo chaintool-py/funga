@@ -2,8 +2,6 @@
 import re
 import os
 import sys
-import stat
-import socket
 import json
 import logging 
 import argparse
@@ -12,13 +10,11 @@ from urllib.parse import urlparse
 # external imports
 import confini
 from jsonrpc.exceptions import *
-from hexathon import add_0x
 
 # local imports
 from crypto_dev_signer.eth.signer import ReferenceSigner
-from crypto_dev_signer.eth.transaction import EIP155Transaction
 from crypto_dev_signer.keystore.reference import ReferenceKeystore
-from crypto_dev_signer.error import UnknownAccountError
+from crypto_dev_signer.cli.handle import SignRequestHandler
 
 logging.basicConfig(level=logging.WARNING)
 logg = logging.getLogger()
@@ -72,171 +68,15 @@ logg.info('using dsn {}'.format(dsn))
 logg.info('using socket {}'.format(config.get('SIGNER_SOCKET_PATH')))
 
 re_http = r'^http'
+re_tcp = r'^tcp'
 re_unix = r'^ipc'
 
-class MissingSecretError(BaseException):
-
-    def __init__(self, message):
-        super(MissingSecretError, self).__init__(message)
+class MissingSecretError(Exception):
+    pass
 
 
-def personal_new_account(p):
-    password = p
-    if p.__class__.__name__ != 'str':
-        if p.__class__.__name__ != 'list':
-            e = JSONRPCInvalidParams()
-            e.data = 'parameter must be list containing one string'
-            raise ValueError(e)
-        logg.error('foo {}'.format(p))
-        if len(p) != 1:
-            e = JSONRPCInvalidParams()
-            e.data = 'parameter must be list containing one string'
-            raise ValueError(e)
-        if p[0].__class__.__name__ != 'str':
-            e = JSONRPCInvalidParams()
-            e.data = 'parameter must be list containing one string'
-            raise ValueError(e)
-        password = p[0]
+def main():
 
-    r = db.new(password)
-             
-    return add_0x(r)
-
-
-# TODO: move to translation module ("personal" rpc namespace is node-specific)
-def personal_signTransaction(p):
-    logg.debug('got {} to sign'.format(p[0]))
-    #t = EIP155Transaction(p[0], p[0]['nonce'], 8995)
-    t = EIP155Transaction(p[0], p[0]['nonce'], p[0]['chainId'])
- #   z = signer.sign_transaction(t, p[1])
- #   raw_signed_tx = t.rlp_serialize()
-    raw_signed_tx = signer.sign_transaction_to_rlp(t, p[1])
-    o = {
-        'raw': '0x' + raw_signed_tx.hex(),
-        'tx': t.serialize(),
-        }
-    logg.debug('signed {}'.format(o))
-    return o
-
-
-def eth_signTransaction(tx):
-    o = personal_signTransaction([tx[0], ''])
-    return o['raw']
-
-
-def eth_sign(p):
-    logg.debug('got message {} to sign'.format(p[1]))
-    message_type = type(p[1]).__name__
-    if message_type != 'str':
-        raise ValueError('invalid message format, must be {}, not {}'.format(message_type))
-    z = signer.sign_ethereum_message(p[0], p[1][2:])
-    return str(z)
-
-
-methods = {
-        'personal_newAccount': personal_new_account,
-        'personal_signTransaction': personal_signTransaction,
-        'eth_signTransaction': eth_signTransaction,
-        'eth_sign': eth_sign,
-    }
-
-
-def jsonrpc_error(rpc_id, err):
-    return {
-            'jsonrpc': '2.0',
-            'id': rpc_id,
-            'error': {
-                'code': err.CODE,
-                'message': err.MESSAGE,
-                },
-            }
-
-
-def jsonrpc_ok(rpc_id, response):
-    return {
-            'jsonrpc': '2.0',
-            'id': rpc_id,
-            'result': response,
-            }
-
-
-def is_valid_json(j):
-    if j.get('id') == 'None':
-        raise ValueError('id missing')
-    return True
-
-
-def process_input(j):
-    rpc_id = j['id']
-    m = j['method']
-    p = j['params']
-    return (rpc_id, methods[m](p))
-
-
-def start_server_tcp(spec):
-    s = socket.socket(family=socket.AF_INET, type=socket.SOCK_STREAM)
-    s.bind(spec)
-    logg.debug('created tcp socket {}'.format(spec))
-    start_server(s)
-
-
-def start_server_unix(socket_path):
-    socket_dir = os.path.dirname(socket_path)
-    try:
-        fi = os.stat(socket_dir)
-        if not stat.S_ISDIR:
-            RuntimeError('socket path {} is not a directory'.format(socket_dir))
-    except FileNotFoundError:
-        os.mkdir(socket_dir)
-
-    try:
-        os.unlink(socket_path)
-    except FileNotFoundError:
-        pass
-    s = socket.socket(family = socket.AF_UNIX, type = socket.SOCK_STREAM)
-    s.bind(socket_path)
-    logg.debug('created unix ipc socket {}'.format(socket_path))
-    start_server(s)
-
-
-def start_server(s):
-    s.listen(10)
-    logg.debug('server started')
-    while True:
-        (csock, caddr) = s.accept()
-        d = csock.recv(4096)
-        j = None
-        try:
-            j = json.loads(d)
-            is_valid_json(j)
-            logg.debug('{}'.format(d.decode('utf-8')))
-        except Exception as e:
-            logg.exception('input error {}'.format(e))
-            csock.send(json.dumps(jsonrpc_error(None, JSONRPCParseError)).encode('utf-8'))
-            csock.close()
-            continue
-
-        try:
-            (rpc_id, r) = process_input(j)
-            r = jsonrpc_ok(rpc_id, r)
-            j = json.dumps(r).encode('utf-8')
-            csock.send(j)
-        except ValueError as e:
-            # TODO: handle cases to give better error context to caller
-            logg.exception('process error {}'.format(e))
-            csock.send(json.dumps(jsonrpc_error(j['id'], JSONRPCServerError)).encode('utf-8'))
-        except UnknownAccountError as e:
-            logg.exception('process unknown account error {}'.format(e))
-            csock.send(json.dumps(jsonrpc_error(j['id'], JSONRPCServerError)).encode('utf-8'))
-
-        csock.close()
-    s.close()
-
-    os.unlink(socket_path)
-
-
-def init():
-    global db, signer
     secret_hex = config.get('SIGNER_SECRET')
     if secret_hex == None:
         raise MissingSecretError('please provide a valid hex value for the SIGNER_SECRET configuration variable')
@@ -245,26 +85,31 @@ def init():
     kw = {
             'symmetric_key': secret,
             }
-    db = ReferenceKeystore(dsn, **kw)
-    signer = ReferenceSigner(db)
+    SignRequestHandler.keystore = ReferenceKeystore(dsn, **kw)
+    SignRequestHandler.signer = ReferenceSigner(SignRequestHandler.keystore)
 
-
-def main():
-    init()
     arg = None
     try:
         arg = json.loads(sys.argv[1])
     except:
-        logg.info('no json rpc command detected, starting socket server')
+        logg.info('no json rpc command detected, starting socket server {}'.format(socket_url))
         scheme = 'ipc'
         if socket_url.scheme != '':
             scheme = socket_url.scheme
-        if re.match(re_http, socket_url.scheme):
+        if re.match(re_tcp, socket_url.scheme):
+            from crypto_dev_signer.cli.socket import start_server_tcp
             socket_spec = socket_url.netloc.split(':')
             host = socket_spec[0]
             port = int(socket_spec[1])
             start_server_tcp((host, port))
+        elif re.match(re_http, socket_url.scheme):
+            from crypto_dev_signer.cli.http import start_server_http
+            socket_spec = socket_url.netloc.split(':')
+            host = socket_spec[0]
+            port = int(socket_spec[1])
+            start_server_http((host, port))
         else:
+            from crypto_dev_signer.cli.socket import start_server_unix
             start_server_unix(socket_url.path)
         sys.exit(0)
    
