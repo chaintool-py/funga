@@ -48,7 +48,7 @@ class ReferenceSigner(Signer):
 
 
     def sign_transaction_to_wire(self, tx, password=None):
-        return sign_transaction_to_wire(tx, password=password)
+        return sign_transaction_to_rlp(tx, password=password)
 
 
     def sign_ethereum_message(self, address, message, password=None):
