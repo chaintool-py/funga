@@ -47,6 +47,10 @@ class ReferenceSigner(Signer):
         return tx.rlp_serialize()
 
 
+    def sign_transaction_to_wire(self, tx, password=None):
+        return sign_transaction_to_wire(tx, password=password)
+
+
     def sign_ethereum_message(self, address, message, password=None):
         
         #k = keys.PrivateKey(self.keyGetter.get(address, password))
