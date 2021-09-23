@@ -80,3 +80,11 @@ class ReferenceSigner(Signer):
         pk = coincurve.PrivateKey(secret=self.keyGetter.get(address, password))
         z = pk.sign_recoverable(hasher=None, message=message)
         return z
+
+
+    def sign_message(self, address, message, password=None, dialect='eth'):
+        if dialect == None:
+            return self.sign_pure(address, message, password=password)
+        elif dialect == 'eth':
+            return self.sign_ethereum_message(address, message, password=password)
+        raise ValueError('Unknown message sign dialect "{}"'.format(dialect))
