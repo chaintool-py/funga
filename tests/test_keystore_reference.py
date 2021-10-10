@@ -12,8 +12,8 @@ from psycopg2 import sql
 from cryptography.fernet import Fernet, InvalidToken
 
 # local imports
-from crypto_dev_signer.keystore.reference import ReferenceKeystore
-from crypto_dev_signer.error import UnknownAccountError
+from funga.eth.keystore.sql import SQLKeystore
+from funga.error import UnknownAccountError
 
 logging.basicConfig(level=logging.DEBUG)
 logg = logging.getLogger()
@@ -37,7 +37,7 @@ class TestDatabase(unittest.TestCase):
         kw = {
                 'symmetric_key': self.symkey,
                 }
-        self.db = ReferenceKeystore('postgres+psycopg2://postgres@localhost:5432/signer_test', **kw)
+        self.db = SQLKeystore('postgres+psycopg2://postgres@localhost:5432/signer_test', **kw)
         self.address_hex = self.db.new('foo')
         #self.address_hex = add_0x(address_hex)
 

@@ -5,8 +5,6 @@ import base64
 # external imports
 from cryptography.fernet import Fernet
 #import psycopg2
-#from psycopg2 import sql
-#from psycopg2.extensions import make_dsn
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 import sha3
@@ -16,10 +14,10 @@ from hexathon import (
         )
 
 # local imports
-from .interface import Keystore
+from .interface import EthKeystore
 #from . import keyapi
-from crypto_dev_signer.error import UnknownAccountError
-from crypto_dev_signer.encoding import private_key_to_address
+from funga.error import UnknownAccountError
+from funga.eth.encoding import private_key_to_address
 
 logg = logging.getLogger(__name__)
 
@@ -28,7 +26,7 @@ def to_bytes(x):
     return x.encode('utf-8')
 
 
-class ReferenceKeystore(Keystore):
+class SQLKeystore(EthKeystore):
 
         schema = [
     """CREATE TABLE IF NOT EXISTS ethereum (
@@ -42,6 +40,7 @@ class ReferenceKeystore(Keystore):
     ]
 
         def __init__(self, dsn, **kwargs):
+            super(SQLKeystore, self).__init__()
             logg.debug('starting db session with dsn {}'.format(dsn))
             self.db_engine = create_engine(dsn)
             self.db_session = sessionmaker(bind=self.db_engine)()
