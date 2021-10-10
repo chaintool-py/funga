@@ -53,7 +53,7 @@ def is_checksum_address(address_hex):
         hx = to_checksum(address_hex)
     except ValueError:
         return False
-    return hx == address_hex
+    return hx == strip_0x(address_hex)
 
 
 def to_checksum_address(address_hex):
@@ -65,7 +65,8 @@ def to_checksum_address(address_hex):
         h.update(address_hex.encode('utf-8'))
         z = h.digest()
 
-        checksum_address_hex = '0x'
+        #checksum_address_hex = '0x'
+        checksum_address_hex = ''
 
         for (i, c) in enumerate(address_hex):
             if c in '1234567890':
@@ -79,3 +80,12 @@ def to_checksum_address(address_hex):
         return checksum_address_hex
 
 to_checksum = to_checksum_address
+
+ethereum_recid_modifier = 35
+
+def chain_id_to_v(chain_id, signature):
+    v = signature[64]
+    return (chain_id * 2) + ethereum_recid_modifier + v
+
+def chainv_to_v(chain_id, v):
+    return v - ethereum_recid_modifier - (chain_id * 2)

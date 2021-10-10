@@ -7,27 +7,16 @@ import coincurve
 from hexathon import int_to_minbytes
 
 # local imports
-from crypto_dev_signer.eth.encoding import chain_id_to_v
+from funga.signer import Signer
+from funga.eth.encoding import chain_id_to_v
 
 logg = logging.getLogger(__name__)
 
 
-class Signer:
-
-
-    def __init__(self, keyGetter):
-        self.keyGetter = keyGetter
-
-
-    def sign_transaction(self, tx, password=None):
-        return NotImplementedError
-
-
-class ReferenceSigner(Signer):
-   
+class EIP155Signer(Signer):
 
     def __init__(self, keyGetter):
-        super(ReferenceSigner, self).__init__(keyGetter)
+        super(EIP155Signer, self).__init__(keyGetter)
 
 
     def sign_transaction(self, tx, password=None):

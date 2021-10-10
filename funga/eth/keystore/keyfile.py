@@ -12,7 +12,7 @@ from Crypto.Util import Counter
 import sha3
 
 # local imports
-from crypto_dev_signer.encoding import private_key_to_address
+from funga.eth.encoding import private_key_to_address
 
 logg = logging.getLogger(__name__)
 
@@ -141,3 +141,18 @@ def from_file(filepath, passphrase=''):
     f.close()
 
     return from_dict(o, passphrase)
+
+
+def from_some(v, passphrase=''):
+    if isinstance(v, bytes):
+        v = v.decode('utf-8')
+
+    if isinstance(v, str):
+        try:
+            return from_file(v, passphrase)
+        except Exception:
+            logg.debug('keyfile parse as file fail')
+            pass
+        v = json.loads(v)
+
+    return from_dict(v, passphrase)

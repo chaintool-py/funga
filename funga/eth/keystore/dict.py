@@ -9,14 +9,14 @@ from hexathon import (
 
 # local imports
 #from . import keyapi
-from .interface import Keystore
-from crypto_dev_signer.error import UnknownAccountError
-from crypto_dev_signer.encoding import private_key_to_address
+from funga.error import UnknownAccountError
+from .interface import EthKeystore
+from funga.eth.encoding import private_key_to_address
 
 logg = logging.getLogger(__name__)
 
 
-class DictKeystore(Keystore):
+class DictKeystore(EthKeystore):
 
     def __init__(self):
         self.keys = {}

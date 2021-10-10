@@ -4,23 +4,28 @@ import json
 import logging
 
 # local imports
-from crypto_dev_signer.keystore import keyfile
-from crypto_dev_signer.encoding import private_key_from_bytes
+from funga.keystore import Keystore
+from funga.eth.keystore import keyfile
+from funga.eth.encoding import private_key_from_bytes
 
 logg = logging.getLogger(__name__)
 
-class Keystore:
 
-    def get(self, address, password=None):
-        raise NotImplementedError
+def native_keygen(self):
+    return os.urandom(32)
 
 
-    def list(self):
-        raise NotImplementedError
+class EthKeystore(Keystore):
 
+    def __init__(self, private_key_generator=native_keygen):
+        super(Keystore, self).__init__(
+                private_key_generator=private_key_generator,
+                private_key_parser=private_key_from_bytes,
+                keystore_parser=keyfile.from_some,
+                )
+            
 
     def new(self, password=None):
-        b = os.urandom(32)
         return self.import_raw_key(b, password)
 
 
@@ -41,6 +46,7 @@ class Keystore:
             keystore_content = json.loads(keystore_content.decode('utf-8'))
         private_key = keyfile.from_dict(keystore_content, password.encode('utf-8'))
         return self.import_raw_key(private_key, password)
+
 
     def import_keystore_file(self, keystore_file, password=''):
         private_key = keyfile.from_file(keystore_file, password)

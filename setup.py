@@ -32,18 +32,18 @@ while True:
 f.close()
 
 setup(
-        name="crypto-dev-signer",
-        version="0.4.15a7",
+        name="funga",
+        version="0.5.1a1",
         description="A signer and keystore daemon and library for cryptocurrency software development",
         author="Louis Holbrook",
         author_email="dev@holbrook.no",
         packages=[
-            'crypto_dev_signer.eth.signer',
-            'crypto_dev_signer.eth',
-            'crypto_dev_signer.cli',
-            'crypto_dev_signer.keystore',
-            'crypto_dev_signer.runnable',
-            'crypto_dev_signer',
+            'funga.eth.signer',
+            'funga.eth',
+            'funga.cli',
+            'funga.keystore',
+            'funga.runnable',
+            'funga',
             ],
         install_requires=requirements,
         extras_require={
@@ -54,9 +54,9 @@ setup(
         long_description_content_type='text/markdown',
         entry_points = {
             'console_scripts': [
-                'crypto-dev-daemon=crypto_dev_signer.runnable.signer:main',
-                'eth-keyfile=crypto_dev_signer.runnable.keyfile:main',
+                'crypto-dev-daemon=funga.runnable.signer:main',
+                'eth-keyfile=funga.runnable.keyfile:main',
                 ],
             },
-        url='https://gitlab.com/chaintool/crypto-dev-signer',
+        url='https://gitlab.com/chaintool/funga',
         )

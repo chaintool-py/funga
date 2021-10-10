@@ -13,9 +13,9 @@ from hexathon import (
     )
 
 # local imports
-from crypto_dev_signer.keystore.dict import DictKeystore
-from crypto_dev_signer.error import UnknownAccountError
-from crypto_dev_signer.eth.signer import ReferenceSigner
+from funga.error import UnknownAccountError
+from funga.eth.keystore.dict import DictKeystore
+from funga.eth.signer import EIP155Signer
 
 logging.basicConfig(level=logging.DEBUG)
 logg = logging.getLogger()
@@ -53,7 +53,7 @@ class TestDict(unittest.TestCase):
 
     
     def test_sign_message(self):
-        s = ReferenceSigner(self.db)
+        s = EIP155Signer(self.db)
         z = s.sign_ethereum_message(strip_0x(self.address_hex), b'foo')
         logg.debug('zzz {}'.format(str(z)))
 
