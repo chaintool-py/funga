@@ -13,15 +13,6 @@ while True:
     requirements.append(l.rstrip())
 f.close()
 
-sql_requirements = []
-f = open('sql_requirements.txt', 'r')
-while True:
-    l = f.readline()
-    if l == '':
-        break
-    sql_requirements.append(l.rstrip())
-f.close()
-
 test_requirements = []
 f = open('test_requirements.txt', 'r')
 while True:
@@ -39,24 +30,10 @@ setup(
         author_email="dev@holbrook.no",
         packages=[
             'funga',
-            'funga.eth.signer',
-            'funga.eth',
-            'funga.eth.cli',
-            'funga.eth.keystore',
-            'funga.eth.runnable',
             ],
         install_requires=requirements,
-        extras_require={
-            'sql': sql_requirements,
-            },
         tests_require=test_requirements,
         long_description=long_description,
         long_description_content_type='text/markdown',
-        entry_points = {
-            'console_scripts': [
-                'crypto-dev-daemon=funga.runnable.signer:main',
-                'eth-keyfile=funga.runnable.keyfile:main',
-                ],
-            },
-        url='https://gitlab.com/chaintool/funga',
+       url='https://gitlab.com/chaintool/funga',
         )
