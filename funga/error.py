@@ -21,4 +21,9 @@ class SignerError(Exception):
         return self.jsonrpc_error
 
 
+class DecryptError(Exception):
+    pass
 
+
+class KeyfileError(Exception):
+    pass

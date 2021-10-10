@@ -23,6 +23,14 @@ class Keystore:
         raise NotImplementedError
 
 
+    def lock(self, address=None):
+        raise NotImplementedError
+       
+
+    def unlock(self, address=None):
+        raise NotImplementedError
+
+
     def new(self, password=None):
         self.private_key_generator(password=password)
        

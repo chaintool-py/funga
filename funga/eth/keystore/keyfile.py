@@ -12,6 +12,10 @@ from Crypto.Util import Counter
 import sha3
 
 # local imports
+from funga.error import (
+        DecryptError,
+        KeyfileError,
+        )
 from funga.eth.encoding import private_key_to_address
 
 logg = logging.getLogger(__name__)
@@ -127,17 +131,28 @@ def from_dict(o, passphrase=''):
     
     # check mac
     calculated_mac = to_mac(decryption_key[16:], ciphertext_bytes)
-    assert control_mac == calculated_mac
-
+    if control_mac != calculated_mac:
+        raise DecryptError('mac mismatch when decrypting passphrase')
+    
     m = getattr(Ciphers, 'decrypt_{}'.format(cipher.replace('-', '_')))
-    pk = m(ciphertext_bytes, decryption_key[:16], iv)
+
+    try:
+        pk = m(ciphertext_bytes, decryption_key[:16], iv)
+    except AssertionError as e:
+        raise DecryptError('could not decrypt keyfile: {}'.format(e))
+    logg.debug('bar')
+
     return pk
 
 
 def from_file(filepath, passphrase=''):
 
     f = open(filepath, 'r')
-    o = json.load(f)
+    try:
+        o = json.load(f)
+    except json.decoder.JSONDecodeError as e:
+        f.close()
+        raise KeyfileError(e)
     f.close()
 
     return from_dict(o, passphrase)

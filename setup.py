@@ -38,12 +38,12 @@ setup(
         author="Louis Holbrook",
         author_email="dev@holbrook.no",
         packages=[
+            'funga',
             'funga.eth.signer',
             'funga.eth',
-            'funga.cli',
-            'funga.keystore',
-            'funga.runnable',
-            'funga',
+            'funga.eth.cli',
+            'funga.eth.keystore',
+            'funga.eth.runnable',
             ],
         install_requires=requirements,
         extras_require={

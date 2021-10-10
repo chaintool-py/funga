@@ -11,11 +11,12 @@ import coincurve
 from hexathon import strip_0x
 
 # local imports
-from crypto_dev_signer.keystore.keyfile import (
+from funga.error import DecryptError
+from funga.eth.keystore.keyfile import (
         from_file,
         to_dict,
         )
-from crypto_dev_signer.encoding import (
+from funga.eth.encoding import (
         private_key_to_address,
         private_key_from_bytes,
         )
@@ -60,7 +61,7 @@ def main():
             passphrase = getpass.getpass('decryption phrase: ')
         try:
             r = from_file(args.d, passphrase).hex()
-        except AssertionError:
+        except DecryptError:
             sys.stderr.write('Invalid passphrase\n')
             sys.exit(1)
         if not secret:
