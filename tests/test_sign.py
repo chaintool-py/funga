@@ -1,12 +1,12 @@
-#!/usr/bin/python
-
+# standard imports
 import unittest
 import logging
+import json
 
 from rlp import encode as rlp_encode
 
-from crypto_dev_signer.eth.signer import ReferenceSigner
-from crypto_dev_signer.eth.transaction import EIP155Transaction
+from funga.eth.signer import EIP155Signer
+from funga.eth.transaction import EIP155Transaction
 
 logging.basicConfig(level=logging.DEBUG)
 logg = logging.getLogger()
@@ -68,14 +68,15 @@ class TestSign(unittest.TestCase):
         t = EIP155Transaction(tx_ints, 0)
         self.assertRegex(t.__class__.__name__, "Transaction")
         s = t.serialize()
-        self.assertEqual('{}'.format(s), "{'nonce': '0x', 'gasPrice': '0x04a817c800', 'gas': '0x5208', 'to': '0x3535353535353535353535353535353535353535', 'value': '0x03e8', 'data': '0xdeadbeef', 'v': '0x01', 'r': '0x', 's': '0x'}")
+        self.assertDictEqual(s, {'nonce': '0x', 'gasPrice': '0x04a817c800', 'gas': '0x5208', 'to': '0x3535353535353535353535353535353535353535', 'value': '0x03e8', 'data': '0xdeadbeef', 'v': '0x01', 'r': '0x', 's': '0x'})
         r = t.rlp_serialize()
         self.assertEqual(r.hex(), 'ea808504a817c8008252089435353535353535353535353535353535353535358203e884deadbeef018080')
 
         t = EIP155Transaction(tx_hexs, 0)
         self.assertRegex(t.__class__.__name__, "Transaction")
         s = t.serialize()
-        self.assertEqual('{}'.format(s), "{'nonce': '0x', 'gasPrice': '0x04a817c800', 'gas': '0x5208', 'to': '0x3535353535353535353535353535353535353535', 'value': '0x03e8', 'data': '0xdeadbeef', 'v': '0x01', 'r': '0x', 's': '0x'}")
+        #o = json.loads(s)
+        self.assertDictEqual(s, {'nonce': '0x', 'gasPrice': '0x04a817c800', 'gas': '0x5208', 'to': '0x3535353535353535353535353535353535353535', 'value': '0x03e8', 'data': '0xdeadbeef', 'v': '0x01', 'r': '0x', 's': '0x'})
         r = t.rlp_serialize()
         self.assertEqual(r.hex(), 'ea808504a817c8008252089435353535353535353535353535353535353535358203e884deadbeef018080')
 
@@ -83,12 +84,12 @@ class TestSign(unittest.TestCase):
 
     def test_sign_transaction(self):
         t = EIP155Transaction(tx_ints, 461, 8995)
-        s = ReferenceSigner(self.pk_getter)
+        s = EIP155Signer(self.pk_getter)
         z = s.sign_transaction(t)
 
 
     def test_sign_message(self):
-        s = ReferenceSigner(self.pk_getter)
+        s = EIP155Signer(self.pk_getter)
         z = s.sign_ethereum_message(tx_ints['from'], '666f6f')
         z = s.sign_ethereum_message(tx_ints['from'], b'foo')
         logg.debug('zzz {}'.format(str(z)))
