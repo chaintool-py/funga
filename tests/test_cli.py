@@ -7,10 +7,10 @@ import os
 from hexathon import strip_0x
 
 # local imports
-from crypto_dev_signer.eth.signer import ReferenceSigner
-from crypto_dev_signer.keystore.dict import DictKeystore
-from crypto_dev_signer.cli.handle import SignRequestHandler
-from crypto_dev_signer.eth.transaction import EIP155Transaction
+from funga.eth.signer import EIP155Signer
+from funga.eth.keystore.dict import DictKeystore
+from funga.eth.cli.handle import SignRequestHandler
+from funga.eth.transaction import EIP155Transaction
 
 logging.basicConfig(level=logging.DEBUG)
 logg = logging.getLogger()
@@ -25,7 +25,7 @@ class TestCli(unittest.TestCase):
         #pk_getter = pkGetter(pk)
         self.keystore = DictKeystore()
         SignRequestHandler.keystore = self.keystore
-        self.signer = ReferenceSigner(self.keystore)
+        self.signer = EIP155Signer(self.keystore)
         SignRequestHandler.signer = self.signer
         self.handler = SignRequestHandler()
 

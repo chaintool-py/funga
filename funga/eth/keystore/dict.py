@@ -19,6 +19,7 @@ logg = logging.getLogger(__name__)
 class DictKeystore(EthKeystore):
 
     def __init__(self):
+        super(DictKeystore, self).__init__()
         self.keys = {}
 
 

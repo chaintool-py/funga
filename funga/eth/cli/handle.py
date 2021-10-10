@@ -11,12 +11,12 @@ from jsonrpc.exceptions import (
 from hexathon import add_0x
 
 # local imports
-from crypto_dev_signer.eth.transaction import EIP155Transaction
-from crypto_dev_signer.error import (
+from funga.eth.transaction import EIP155Transaction
+from funga.error import (
         UnknownAccountError,
         SignerError,
         )
-from crypto_dev_signer.cli.jsonrpc import jsonrpc_ok
+from funga.eth.cli.jsonrpc import jsonrpc_ok
 from .jsonrpc import (
         jsonrpc_error,
         is_valid_json,

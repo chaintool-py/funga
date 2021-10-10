@@ -1,5 +1,5 @@
 # local imports
-from crypto_dev_signer.error import UnknownAccountError
+from funga.error import UnknownAccountError
 
 
 def jsonrpc_error(rpc_id, err):
