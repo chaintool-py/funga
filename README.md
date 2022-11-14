@@ -12,43 +12,14 @@ This package is written because at the time no good solution seemed to exist for
 
 ## TECHNICAL OVERVIEW
 
-### Scripts
-
-When installed with pip/setuptools, this package provides a Unix socket IPC server as `crypto-dev-daemon` implementing the following web3 json-rpc methods:
-
-* web3.eth.personal.newAccount
-* web3.eth.personal.signTransaction
-* web3.eth.signTransaction
-
-### Classes
-
-The classes and packages provided are:
-
-#### keystore
+### keystore
 
 - **Keystore**: Interface definition
-- **ReferenceKeystore**: Implements the `Keystore` interface, with a postgresql backend expecting sql schema as defined in `ReferenceKeystore.schema`
 
-#### transaction
+### transaction
 
 - **Transaction**: Interface definition.
-- **EIP155Transaction**: Creates transaction serializations appropriate for EIP155 replay protected signatures. Accepts a web3 format transaction dict as constructor argument together with nonce and optional chainId.
 
-#### signer
+### signer
 
 - **Signer**: Interface definition. Its `signTransaction` method expects an object implementing the `Transaction` interface.
-- **ReferenceSigner** Implements `Signer`, accepting a single argument of type `Keystore` interface. 
-
-## VERSION
-
-This software is in alpha state.
-
-Current version is 0.2.5
-
-## LICENSE
-
-GPLv3
-
-## LEGAL MUMBO-JUMBO
-
-No responsibility assumed for any use of this software. You're on your own, as usual.
