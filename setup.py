@@ -24,7 +24,7 @@ f.close()
 
 setup(
         name="funga",
-        version="0.5.1",
+        version="0.5.3",
         description="A signer and keystore daemon and library for cryptocurrency software development",
         author="Louis Holbrook",
         author_email="dev@holbrook.no",
@@ -35,5 +35,5 @@ setup(
         tests_require=test_requirements,
         long_description=long_description,
         long_description_content_type='text/markdown',
-       url='https://gitlab.com/chaintool/funga',
+        url='https://git.defalsify.org/funga.git',
         )
