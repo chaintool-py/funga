@@ -35,5 +35,5 @@ setup(
         tests_require=test_requirements,
         long_description=long_description,
         long_description_content_type='text/markdown',
-        url='https://git.defalsify.org/funga.git',
+        url='https://git.defalsify.org/funga',
         )
