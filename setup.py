@@ -24,7 +24,7 @@ f.close()
 
 setup(
         name="funga",
-        version="0.5.5",
+        version="0.5.6",
         description="A signer and keystore daemon and library for cryptocurrency software development",
         author="Louis Holbrook",
         author_email="dev@holbrook.no",
