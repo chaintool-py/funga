@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<Signature Id="sig-a0f819f9-6813-4f14-a7c8-f33c12f0c846" xmlns="http://www.w3.org/2000/09/xmldsig#">
+	<SignedInfo>
+		<CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
+		<SignatureMethod Algorithm="http://tools.ietf.org/html/rfc6931"/>
+		<Reference Type="http://www.w3.org/2000/09/xmldsig#SignatureProperties">
+			<Transforms>
+				<Transform Algorithm="https://eips.ethereum.org/EIPS/eip-191#version-0x45-e" />
+				<Transform Algorithm="https://csrc.nist.gov/glossary/term/sha_256" />
+			</Transforms>
+			<DigestMethod Algorithm="https://csrc.nist.gov/glossary/term/sha_256" />
+			<DigestValue>drLpZxTTtebrHRxQkmVDC5B7RPcrKiKwb81NljcrhWU=</DigestValue>
+		</Reference>
+	</SignedInfo>
+	<SignatureValue>r3d2ftvM30Y4D+1vBq9DyAfeS+3OLtoSmSM0DpV3yX52vFXVhxA6NnBXFn81GuHP1rjepuAoIlfeNZT749h4BwA=</SignatureValue>
+	
+	<KeyInfo>
+		<KeyName>eb3907ecad74a0013c259d5874ae7f22dcbcc95c</KeyName>
+		<!-- public key: 049f6bb6a7e3f5b7ee71756a891233d1415658f8712bac740282e083dc9240f5368bdb3b256a5bf40a8f7f9753414cb447ee3f796c5f30f7eb40a7f5018fc7f02e -->
+		<ECKeyValue xmlns="http://www.w3.org/2009/xmldsig11">
+			<PublicKey>BJ9rtqfj9bfucXVqiRIz0UFWWPhxK6x0AoLgg9ySQPU2i9s7JWpb9AqPf5dTQUy0R+4/eWxfMPfrQKf1AY/H8C4=</PublicKey>
+			<ECParameters>
+				<FieldID>
+					<Prime>
+						<P>/////////////////////////////////////v///C8=</P>
+					</Prime>
+				</FieldID>
+				<Curve>
+					<A>AAo=</A>
+					<B>Bwo=</B>
+				</Curve>
+				<Base>BHm+Zn753LusVaBilc6HCwcCm/zbLc4o2VnygVsW+BeYSDradyajxGVdpPv8DhEIqP0XtEimhVQZnEfQj/sQ1Lg=</Base>
+				<Order>/////////////////////rqu3OavSKA7v9JejNA2QUE=</Order>
+				<CoFactor>1</CoFactor>
+			</ECParameters>
+		</ECKeyValue>
+	</KeyInfo>
+	<Object>
+		<SignatureProperties>
+			<SignatureProperty Id="ts-a0f819f9-6813-4f14-a7c8-f33c12f0c846" Target="sig-a0f819f9-6813-4f14-a7c8-f33c12f0c846">
+				<timestamp xmlns="https://www.epochconverter.com/">
+					<epochSeconds>1686900525</epochSeconds>
+				</timestamp>
+			</SignatureProperty>
+		</SignatureProperties>
+	</Object>
+</Signature>
