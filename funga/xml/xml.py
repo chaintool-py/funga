@@ -1,13 +1,18 @@
 # standard imports 
+import os
 from enum import Enum
 import logging
 import xml.etree.ElementTree as ET
 from base64 import b64decode
 
+# local imports
+from funga.data import data_dir
+
 logg = logging.getLogger(__name__)
 
 SignatureAccept = Enum('SignatureAccept', 'CANONICALIZATION SIGNING TRANSFORM DIGEST')
 SignatureVerify = Enum('SignatureVerify', 'SIGNATURE DIGEST PUBLICKEY')
+
 
 
 def cryptobinary_to_int(v):
@@ -22,7 +27,7 @@ class SignatureParser:
             'dsig11': "http://www.w3.org/2009/xmldsig11",
                   }
 
-    def __init__(self):
+    def __init__(self, validate_schema=True):
         self.__tree = None
         self.__signature_verifier = None
         self.__settings = [
@@ -36,22 +41,34 @@ class SignatureParser:
                 None,
                 None,
                 ]
-        self.__r = None
+        self.__schema = None
+        if validate_schema:
+            self.__load_schema_validator()
         self.clear()
+
+    
+    def __load_schema_validator(self):
+        import importlib
+        m = None
+        try:
+            m = importlib.import_module('xmlschema')
+        except ModuleNotFoundError:
+            return
+        sp = os.path.join(data_dir, 'xmldsig1-schema.xsd')
+        self.__schema = m.XMLSchema(sp)
 
 
     def clear(self):
-        self.__r = {
-                'sig': None,
-                'pubkey': None,
-                'prime': None,
-                'curve_a': None,
-                'curve_b': None,
-                'base': None,
-                'order': None,
-                'cofactor': None,
-                'keyname': None,
-                }
+        self.signature = None
+        self.digest = None
+        self.public_key = None
+        self.prime = None
+        self.curve_a = None
+        self.curve_b = None
+        self.base = None
+        self.order = None
+        self.cofactor = None
+        self.keyname = None
 
 
     def set(self, k, v):
@@ -69,8 +86,15 @@ class SignatureParser:
             return self.__verify[k.value - 1]
         raise ValueError('invalid key: {}'.format(k))
 
+    
+    def __verify_schema(self, fp):
+        if self.__schema == None:
+            return
+        schema.validate(fp)
+
 
     def process_file(self, fp):
+        self.__verify_schema(fp)
         self.__tree = ET.parse(fp)
         self.__root = self.__tree.getroot()
         self.__verify_canonicalization(self.__root[0][0])
@@ -82,7 +106,6 @@ class SignatureParser:
         r = self.__root.find('./KeyInfo', namespaces=self.namespaces)
         if r != None:
             self.__opt_verify_keyinfo(r)
-        logg.debug('result {}'.format(self.__r))
 
 
     def __verify_canonicalization(self, el):
@@ -98,7 +121,7 @@ class SignatureParser:
         m = self.get(SignatureVerify.SIGNATURE)
         if m != None:
             assert m(b)
-        self.__r['sig'] = b
+        self.signature = b
 
     def __opt_verify_signedinfo(self, el):
         r = el.find('./DigestMethod', namespaces=self.namespaces)
@@ -110,17 +133,17 @@ class SignatureParser:
             m = self.get(SignatureVerify.DIGEST)
             if m != None:
                 assert m(b)
-            self.__r['digest'] = b
+            self.digest = b
 
 
     def __opt_verify_keyinfo(self, el):
         r = el.find('./dsig11:ECKeyValue', namespaces=self.namespaces)
         if r != None:
-            assert self.__opt_verify_keyinfo_eckey(r)
+            self.__opt_verify_keyinfo_eckey(r)
 
         r = el.find('./KeyName', namespaces=self.namespaces)
         if r != None:
-            self.__r['keyname'] = r.text
+            self.keyname = r.text
 
 
     def __opt_verify_keyinfo_eckey(self, el):
@@ -130,18 +153,17 @@ class SignatureParser:
             m = self.get(SignatureVerify.PUBLICKEY)
             if m != None:
                 assert m(b)
-            self.__r['pubkey'] = b
+            self.public_key = b
         r = el.find('./dsig11:ECParameters/dsig11:FieldID/dsig11:Prime/dsig11:P', namespaces=self.namespaces)
-        self.__r['prime'] = cryptobinary_to_int(r.text)
+        self.prime = cryptobinary_to_int(r.text)
         r = el.find('./dsig11:ECParameters/dsig11:Curve/dsig11:A', namespaces=self.namespaces)
-        self.__r['curve_a'] = cryptobinary_to_int(r.text)
+        self.curve_a = cryptobinary_to_int(r.text)
         r = el.find('./dsig11:ECParameters/dsig11:Curve/dsig11:B', namespaces=self.namespaces)
-        self.__r['curve_b'] = cryptobinary_to_int(r.text)
+        self.curve_b = cryptobinary_to_int(r.text)
         r = el.find('./dsig11:ECParameters/dsig11:Base', namespaces=self.namespaces)
-        self.__r['base'] = cryptobinary_to_int(r.text)
+        self.base = cryptobinary_to_int(r.text)
         r = el.find('./dsig11:ECParameters/dsig11:Order', namespaces=self.namespaces)
-        self.__r['order'] = cryptobinary_to_int(r.text)
+        self.order = cryptobinary_to_int(r.text)
         r = el.find('./dsig11:ECParameters/dsig11:CoFactor', namespaces=self.namespaces)
-        self.__r['cofactor'] = int(r.text)
-
-        return True
+        if r != None:
+            self.cofactor = int(r.text)

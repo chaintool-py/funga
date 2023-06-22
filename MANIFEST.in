@@ -1,1 +1,1 @@
-include *requirements* CHANGELOG WAIVER WAIVER.asc LICENSE
+include *requirements* CHANGELOG WAIVER WAIVER.asc LICENSE funga/data/*.xsd
