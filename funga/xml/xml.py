@@ -20,6 +20,15 @@ def cryptobinary_to_int(v):
     return int.from_bytes(b, byteorder='big')
 
 
+def cryptobinary_to_pair(v):
+    b = b64decode(v)
+    b = b[1:] # TODO: force uncompressed
+    l = int(len(b) / 2)
+    x = int.from_bytes(b[:l], byteorder='big')
+    y = int.from_bytes(b[l:], byteorder='big')
+    return (x, y,)
+
+
 class SignatureParser:
 
     namespaces = {
@@ -62,17 +71,23 @@ class SignatureParser:
 
 
     def clear(self):
-        self.signature = None
+        self.sig_r = None
+        self.sig_s = None
+        self.sig_v = None
         self.digest = None
         self.public_key = None
         self.prime = None
         self.curve_a = None
         self.curve_b = None
-        self.base = None
+        self.base_x = None
+        self.base_y = None
         self.order = None
         self.cofactor = None
         self.keyname = None
 
+
+    def __str__(self):
+        return 'order {}'.format(self.order)
 
     def set(self, k, v):
         if k.__class__.__name__ == 'SignatureAccept':
@@ -124,7 +139,11 @@ class SignatureParser:
         m = self.get(SignatureVerify.SIGNATURE)
         if m != None:
             assert m(b)
-        self.signature = b
+        #self.signature = b
+        logg.debug('sig {}'.format(b.hex()))
+        self.sig_r = int.from_bytes(b[:32], byteorder='little')
+        self.sig_s = int.from_bytes(b[32:64], byteorder='little')
+        self.sig_v = int(b[64])
 
     def __opt_verify_signedinfo(self, el):
         r = el.find('./DigestMethod', namespaces=self.namespaces)
@@ -164,7 +183,7 @@ class SignatureParser:
         r = el.find('./dsig11:ECParameters/dsig11:Curve/dsig11:B', namespaces=self.namespaces)
         self.curve_b = cryptobinary_to_int(r.text)
         r = el.find('./dsig11:ECParameters/dsig11:Base', namespaces=self.namespaces)
-        self.base = cryptobinary_to_int(r.text)
+        (self.base_x, self.base_y) = cryptobinary_to_pair(r.text)
         r = el.find('./dsig11:ECParameters/dsig11:Order', namespaces=self.namespaces)
         self.order = cryptobinary_to_int(r.text)
         r = el.find('./dsig11:ECParameters/dsig11:CoFactor', namespaces=self.namespaces)

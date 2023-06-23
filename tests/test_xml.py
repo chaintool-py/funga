@@ -4,6 +4,10 @@ import unittest
 import os
 from base64 import b64decode
 
+# external imports
+from fastecdsa import curve
+from fastecdsa import ecdsa
+
 # local imports
 from funga.xml import SignatureParser
 from funga.xml import SignatureAccept
@@ -73,9 +77,38 @@ class TestXmlSig(unittest.TestCase):
         self.parser.set(SignatureVerify.PUBLICKEY, verify_pub_ok)
         self.parser.process_file(self.xml_file)
 
-        self.assertEqual(self.parser.signature.hex(), 'af77767edbccdf46380fed6f06af43c807de4bedce2eda129923340e9577c97e76bc55d587103a367057167f351ae1cfd6b8dea6e0282257de3594fbe3d8780700')
+        #self.assertEqual(self.parser.signature.hex(), 'af77767edbccdf46380fed6f06af43c807de4bedce2eda129923340e9577c97e76bc55d587103a367057167f351ae1cfd6b8dea6e0282257de3594fbe3d8780700')
         self.assertEqual(self.parser.public_key.hex(), '049f6bb6a7e3f5b7ee71756a891233d1415658f8712bac740282e083dc9240f5368bdb3b256a5bf40a8f7f9753414cb447ee3f796c5f30f7eb40a7f5018fc7f02e')
         self.assertEqual(self.parser.digest.hex(), '76b2e96714d3b5e6eb1d1c509265430b907b44f72b2a22b06fcd4d96372b8565')
+
+        logg.debug('r {}'.format(self.parser))
+
+        c = curve.Curve(
+                'eth',
+                self.parser.prime,
+                self.parser.curve_a,
+                self.parser.curve_b,
+                self.parser.order,
+                self.parser.base_x,
+                self.parser.base_y,
+                )
+
+        class Pubk:
+            def __init__(self, x, y):
+                self.x = x
+                self.y = y
+
+        x = int.from_bytes(self.parser.public_key[1:33], byteorder='big')
+        y = int.from_bytes(self.parser.public_key[33:65], byteorder='big')
+        pubk = Pubk(x, y)
+
+        ecdsa.verify(
+                (self.parser.sig_r, self.parser.sig_s),
+                self.parser.digest,
+                pubk,
+                curve=c,
+                )
+
 
 
 if __name__ == '__main__':
