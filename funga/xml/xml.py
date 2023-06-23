@@ -54,8 +54,11 @@ class SignatureParser:
             m = importlib.import_module('xmlschema')
         except ModuleNotFoundError:
             return
-        sp = os.path.join(data_dir, 'xmldsig1-schema.xsd')
-        self.__schema = m.XMLSchema(sp)
+        logg.info('found xmlschema module, will validate xml')
+        #sp = os.path.join(data_dir, 'xmldsig1-schema.xsd')
+        sp = os.path.join(data_dir, 'xmldsig-core-schema.xsd')
+        self.__schema = m.XMLSchema(sp, validation='lax')
+        # TODO: add validation for xmldsig11 OR make work with xmldsig1-schema bundle
 
 
     def clear(self):
@@ -90,7 +93,7 @@ class SignatureParser:
     def __verify_schema(self, fp):
         if self.__schema == None:
             return
-        schema.validate(fp)
+        self.__schema.validate(fp)
 
 
     def process_file(self, fp):
