@@ -78,10 +78,15 @@ class TestXmlSig(unittest.TestCase):
         self.parser.set(SignatureVerify.PUBLICKEY, verify_pub_ok)
         self.parser.process_file(self.xml_file)
 
-        #self.assertEqual(self.parser.signature.hex(), 'c2aa0be2d969248cdcb3b812ea4400212e71b39a5948560e2b24b908060b3b392131b1021b2bb792908fb9375a6e482e8d3fdcffbdf506e309041fc87365bf1200')
+        self.assertEqual(self.parser.sig_r, 88049138661219786673382328446851442949676708152514327418479271802005342599993)
+        self.assertEqual(self.parser.sig_s, 15014121175306622951266769875074899597152611817081922798245423703943058669330)
         self.assertEqual(self.parser.public_key.hex(), '049f6bb6a7e3f5b7ee71756a891233d1415658f8712bac740282e083dc9240f5368bdb3b256a5bf40a8f7f9753414cb447ee3f796c5f30f7eb40a7f5018fc7f02e')
         self.assertEqual(self.parser.digest.hex(), 'e08f5c88dd7b076fe3e42f9146980a3c8223324ef7aa3b5b9a6103a6ca657b42')
-        self.assertEqual(self.parser.digest_outer.hex(), 'c34e546b70afeb6962d6faa59eb7f9316fc254cc96534cd181aff6958004c5ee')
+
+        h = sha256()
+        h.update(self.parser.sign_material.encode('utf-8'))
+        digest_outer = h.digest()
+        self.assertEqual(digest_outer.hex(), 'c34e546b70afeb6962d6faa59eb7f9316fc254cc96534cd181aff6958004c5ee')
 
         c = curve.Curve(
                 'eth',
@@ -104,7 +109,6 @@ class TestXmlSig(unittest.TestCase):
 
         r = ecdsa.verify(
                 (self.parser.sig_r, self.parser.sig_s),
-                #self.parser.digest,
                 self.parser.sign_material,
                 pubk,
                 curve=c,

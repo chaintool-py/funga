@@ -1,7 +1,6 @@
 # standard imports 
 import os
 import io
-import hashlib
 from enum import Enum
 import logging
 import xml.etree.ElementTree as ET
@@ -133,9 +132,6 @@ class SignatureParser:
         r = self.__root.find('./SignedInfo', namespaces=self.namespaces)
         v = ET.tostring(r)
         self.sign_material = ET.canonicalize(xml_data=v)
-        h = hashlib.new('sha256')
-        h.update(self.sign_material.encode('utf-8'))
-        self.digest_outer = h.digest()
 
 
     def __verify_canonicalization(self, el):
