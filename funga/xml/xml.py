@@ -1,5 +1,7 @@
 # standard imports 
 import os
+import io
+import hashlib
 from enum import Enum
 import logging
 import xml.etree.ElementTree as ET
@@ -68,6 +70,7 @@ class SignatureParser:
         sp = os.path.join(data_dir, 'xmldsig-core-schema.xsd')
         self.__schema = m.XMLSchema(sp, validation='lax')
         # TODO: add validation for xmldsig11 OR make work with xmldsig1-schema bundle
+        ET.register_namespace('', self.namespaces[''])
 
 
     def clear(self):
@@ -84,10 +87,12 @@ class SignatureParser:
         self.order = None
         self.cofactor = None
         self.keyname = None
+        self.digest_outer = None
+        self.sign_material = None
 
 
     def __str__(self):
-        return 'order {}'.format(self.order)
+        return 'Signature Parser: order {}'.format(self.order)
 
     def set(self, k, v):
         if k.__class__.__name__ == 'SignatureAccept':
@@ -109,6 +114,7 @@ class SignatureParser:
         if self.__schema == None:
             return
         self.__schema.validate(fp)
+        logg.debug('schema validation complete')
 
 
     def process_file(self, fp):
@@ -124,6 +130,12 @@ class SignatureParser:
         r = self.__root.find('./KeyInfo', namespaces=self.namespaces)
         if r != None:
             self.__opt_verify_keyinfo(r)
+        r = self.__root.find('./SignedInfo', namespaces=self.namespaces)
+        v = ET.tostring(r)
+        self.sign_material = ET.canonicalize(xml_data=v)
+        h = hashlib.new('sha256')
+        h.update(self.sign_material.encode('utf-8'))
+        self.digest_outer = h.digest()
 
 
     def __verify_canonicalization(self, el):
@@ -139,10 +151,8 @@ class SignatureParser:
         m = self.get(SignatureVerify.SIGNATURE)
         if m != None:
             assert m(b)
-        #self.signature = b
-        logg.debug('sig {}'.format(b.hex()))
-        self.sig_r = int.from_bytes(b[:32], byteorder='little')
-        self.sig_s = int.from_bytes(b[32:64], byteorder='little')
+        self.sig_r = int.from_bytes(b[:32], byteorder='big')
+        self.sig_s = int.from_bytes(b[32:64], byteorder='big')
         self.sig_v = int(b[64])
 
     def __opt_verify_signedinfo(self, el):

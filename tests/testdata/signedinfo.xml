@@ -1,0 +1,17 @@
+<SignedInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
+		<CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"></CanonicalizationMethod>
+		<SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256"></SignatureMethod>
+		<Reference URI="sha256:2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae">
+			<Transforms>
+				<Transform Algorithm="https://csrc.nist.gov/glossary/term/sha_256"></Transform>
+				<Transform Algorithm="https://eips.ethereum.org/EIPS/eip-191#version-0x45-e"></Transform>
+			</Transforms>
+			<DigestMethod Algorithm="https://csrc.nist.gov/glossary/term/sha_256"></DigestMethod>
+			<DigestValue>4I9ciN17B2/j5C+RRpgKPIIjMk73qjtbmmEDpsple0I=</DigestValue>
+		</Reference>
+		
+		<Reference Type="http://www.w3.org/2000/09/xmldsig#SignatureProperties" URI="#ts-a0f819f9-6813-4f14-a7c8-f33c12f0c846">
+			<DigestMethod Algorithm="https://csrc.nist.gov/glossary/term/sha_256"></DigestMethod>
+			<DigestValue>sBUajLlBHMbzuaU+SiPjLpkzcMzjkKDvBqYhRvB0Lns=</DigestValue>
+		</Reference>
+	</SignedInfo>

@@ -3,6 +3,7 @@ import logging
 import unittest
 import os
 from base64 import b64decode
+from hashlib import sha256
 
 # external imports
 from fastecdsa import curve
@@ -46,7 +47,7 @@ class TestXmlSig(unittest.TestCase):
 
         with self.assertRaises(AssertionError):
             self.parser.process_file(self.xml_file)
-        self.parser.set(SignatureAccept.SIGNING, 'http://tools.ietf.org/html/rfc6931')
+        self.parser.set(SignatureAccept.SIGNING, 'http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256')
 
         with self.assertRaises(AssertionError):
             self.parser.process_file(self.xml_file)
@@ -77,11 +78,10 @@ class TestXmlSig(unittest.TestCase):
         self.parser.set(SignatureVerify.PUBLICKEY, verify_pub_ok)
         self.parser.process_file(self.xml_file)
 
-        #self.assertEqual(self.parser.signature.hex(), 'af77767edbccdf46380fed6f06af43c807de4bedce2eda129923340e9577c97e76bc55d587103a367057167f351ae1cfd6b8dea6e0282257de3594fbe3d8780700')
+        #self.assertEqual(self.parser.signature.hex(), 'c2aa0be2d969248cdcb3b812ea4400212e71b39a5948560e2b24b908060b3b392131b1021b2bb792908fb9375a6e482e8d3fdcffbdf506e309041fc87365bf1200')
         self.assertEqual(self.parser.public_key.hex(), '049f6bb6a7e3f5b7ee71756a891233d1415658f8712bac740282e083dc9240f5368bdb3b256a5bf40a8f7f9753414cb447ee3f796c5f30f7eb40a7f5018fc7f02e')
-        self.assertEqual(self.parser.digest.hex(), '76b2e96714d3b5e6eb1d1c509265430b907b44f72b2a22b06fcd4d96372b8565')
-
-        logg.debug('r {}'.format(self.parser))
+        self.assertEqual(self.parser.digest.hex(), 'e08f5c88dd7b076fe3e42f9146980a3c8223324ef7aa3b5b9a6103a6ca657b42')
+        self.assertEqual(self.parser.digest_outer.hex(), 'c34e546b70afeb6962d6faa59eb7f9316fc254cc96534cd181aff6958004c5ee')
 
         c = curve.Curve(
                 'eth',
@@ -102,13 +102,15 @@ class TestXmlSig(unittest.TestCase):
         y = int.from_bytes(self.parser.public_key[33:65], byteorder='big')
         pubk = Pubk(x, y)
 
-        ecdsa.verify(
+        r = ecdsa.verify(
                 (self.parser.sig_r, self.parser.sig_s),
-                self.parser.digest,
+                #self.parser.digest,
+                self.parser.sign_material,
                 pubk,
                 curve=c,
+                hashfunc=sha256,
                 )
-
+        self.assertTrue(r)
 
 
 if __name__ == '__main__':

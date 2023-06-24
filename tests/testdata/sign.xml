@@ -2,17 +2,22 @@
 <Signature Id="sig-a0f819f9-6813-4f14-a7c8-f33c12f0c846" xmlns="http://www.w3.org/2000/09/xmldsig#">
 	<SignedInfo>
 		<CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
-		<SignatureMethod Algorithm="http://tools.ietf.org/html/rfc6931"/>
-		<Reference Type="http://www.w3.org/2000/09/xmldsig#SignatureProperties">
+		<SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256"/>
+		<Reference URI="sha256:2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae">
 			<Transforms>
-				<Transform Algorithm="https://eips.ethereum.org/EIPS/eip-191#version-0x45-e" />
 				<Transform Algorithm="https://csrc.nist.gov/glossary/term/sha_256" />
+				<Transform Algorithm="https://eips.ethereum.org/EIPS/eip-191#version-0x45-e" />
 			</Transforms>
 			<DigestMethod Algorithm="https://csrc.nist.gov/glossary/term/sha_256" />
-			<DigestValue>drLpZxTTtebrHRxQkmVDC5B7RPcrKiKwb81NljcrhWU=</DigestValue>
+			<DigestValue>4I9ciN17B2/j5C+RRpgKPIIjMk73qjtbmmEDpsple0I=</DigestValue>
+		</Reference>
+		<!--the timestamp the signature was made-->
+		<Reference URI="#ts-a0f819f9-6813-4f14-a7c8-f33c12f0c846" Type="http://www.w3.org/2000/09/xmldsig#SignatureProperties">
+			<DigestMethod Algorithm="https://csrc.nist.gov/glossary/term/sha_256" />
+			<DigestValue>sBUajLlBHMbzuaU+SiPjLpkzcMzjkKDvBqYhRvB0Lns=</DigestValue>
 		</Reference>
 	</SignedInfo>
-	<SignatureValue>r3d2ftvM30Y4D+1vBq9DyAfeS+3OLtoSmSM0DpV3yX52vFXVhxA6NnBXFn81GuHP1rjepuAoIlfeNZT749h4BwA=</SignatureValue>
+	<SignatureValue>wqoL4tlpJIzcs7gS6kQAIS5xs5pZSFYOKyS5CAYLOzkhMbECGyu3kpCPuTdabkgujT/c/731BuMJBB/Ic2W/EgA=</SignatureValue>
 	
 	<KeyInfo>
 		<KeyName>6zkH7K10oAE8JZ1YdK5/Ity8yVw=</KeyName>
@@ -38,8 +43,8 @@
 	<Object>
 		<SignatureProperties>
 			<SignatureProperty Id="ts-a0f819f9-6813-4f14-a7c8-f33c12f0c846" Target="sig-a0f819f9-6813-4f14-a7c8-f33c12f0c846">
-				<timestamp xmlns="https://www.epochconverter.com/">
-					<epochSeconds>1686900525</epochSeconds>
+				<timestamp xmlns="http://epochconverter.com">
+					<epochSeconds>ZIwPLQ==</epochSeconds>
 				</timestamp>
 			</SignatureProperty>
 		</SignatureProperties>
